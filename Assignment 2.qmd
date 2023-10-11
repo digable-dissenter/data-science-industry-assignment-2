@@ -1,6 +1,9 @@
 ---
 title: "Data Science for Industry: Assignment 2"
-format: html
+author: "Kenneth Ssekimpi & Levy Banda"
+student_number: "SSKKEN001 & BNDLEV001"
+ssignment: "Assignment 2"
+format: pdf
 editor: visual
 ---
 
