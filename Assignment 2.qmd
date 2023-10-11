@@ -1,0 +1,59 @@
+---
+title: "Data Science for Industry: Assignment 2"
+format: html
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+## Running Code
+
+When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+
+knitr::opts_knit$set(root.dir = "C:/Users/User/OneDrive/Documents/School/2023/Masters/STA5073Z/Assignments/Assignment 2/ds4l-assignment-2/data/")
+
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, fig.pos = "H", out.extra = "")
+```
+
+You can add options to executable code like this
+
+```{r}
+# Clear global environment
+rm(list=ls())
+
+# Libraries we need
+libs <- c('kableExtra', 'stringr', 'tidyverse')
+
+# Install missing libraries
+installed_libs <- libs %in% rownames(installed.packages())
+if (any(installed_libs == FALSE)) {
+  install.packages(libs[!installed_libs], repos='http://cran.us.r-project.org')
+}
+
+# Load libraries
+invisible(lapply(libs, library, character.only = TRUE))
+```
+
+```{r}
+unzip("sona-addresses-1994-2023.zip")
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
+
+```{r}
+# Get a list of all text files in the directory
+text_files <- list.files(pattern = ".txt")
+
+# Initialize an empty list to store the data
+speech_data <- list()
+
+# Loop through the list of text files and read them into R
+for (file in text_files) {
+  speech <- readLines(file, warn = FALSE)
+  speech_data[[file]] <- speech
+}
+```
