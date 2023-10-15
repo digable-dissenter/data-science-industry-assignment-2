@@ -9,7 +9,7 @@ editor: visual
 
 ```{r setup, include=FALSE}
 
-knitr::opts_knit$set(root.dir = "C:/Users/levyb/Documents/Masters Data Science - 1st Year/DS4I/Assignment_2/ds4l-assignment-2/data/")
+knitr::opts_knit$set(root.dir = "C:/Users/User/OneDrive/Documents/School/2023/Masters/STA5073Z/Assignments/Assignment 2/ds4l-assignment-2/data/")
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, fig.pos = "H", out.extra = "")
 ```
@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, fig.pos = "H", out.extra = 
 rm(list=ls())
 
 # Libraries we need
-libs <- c('kableExtra', 'stringr', 'tidyverse')
+libs <- c('dplyr', 'ggplot2', 'lubridate', 'purrr', 'reshape2', 'text2vec', 'tidyr', 'tidytext', 'topicmodels', 'tm', 'wordcloud')
 
 # Install missing libraries
 installed_libs <- libs %in% rownames(installed.packages())
@@ -35,7 +35,7 @@ invisible(lapply(libs, library, character.only = TRUE))
 unzip("sona-addresses-1994-2023.zip")
 ```
 
-```{r}
+```{r read_data}
 # Get a list of all text files in the directory
 text_files <- list.files(pattern = ".txt")
 
@@ -47,19 +47,10 @@ for (file in text_files) {
   speech <- readLines(file, warn = FALSE)
   speech_data[[file]] <- speech
 }
-
 ```
 
-```{r}
+```{r wrangling}
 #data wrangling 
-library(tidytext)
-library(dplyr)
-library(tidyr)
-library(lubridate)
-library(ggplot2)
-library(tm)
-library(topicmodels)
-
 speech_tibble <- tibble(speech = speech_data)
 speech_tibble <- speech_tibble %>%
   separate(speech, into = c("day", "month" , "year","content"), sep = " ",fill= "right", extra = "merge")
@@ -81,7 +72,8 @@ speech_tibble$Date<- dmy(speech_tibble$Date)
 speech_tibble <- speech_tibble %>%
   mutate(
     President = case_when(
-      Date < ymd("1999-06-14") ~ "Nelson Mandela",
+      Date == ymd("1994-02-28") ~ "F.W. de Klerk",
+      Date > ymd("1994-02-28") & Date < ymd("1999-06-14") ~ "Nelson Mandela",
       Date >= ymd("1999-06-14") & Date < ymd("2008-09-24") ~ "Thabo Mbeki",
       Date >= ymd("2008-09-24") & Date <= ymd("2009-05-09") ~ "Kgalema Motlanthe",
       Date >= ymd("2009-05-09") & Date <= ymd("2018-02-14") ~ "Jacob Zuma",
@@ -89,16 +81,14 @@ speech_tibble <- speech_tibble %>%
     )
   )
 
-
 speech_tokens <- speech_tibble %>%
   unnest_tokens(word, content) %>%
   anti_join(stop_words)
 
 load("dsfi-lexicons.Rdata")
-
 ```
 
-```{r bing sentiment,echo = FALSE}
+```{r bing sentiment}
 speech_sentiment <- speech_tokens %>% 
   left_join(bing, by = "word") %>%
   rename(bing_sentiment = sentiment) %>%
@@ -121,7 +111,7 @@ speech_sentiment %>%
 
 ```
 
-```{r nrc, echo = FALSE}
+```{r nrc}
 speech_sentiment <- speech_sentiment %>% 
   left_join(nrc, by = "word") %>%
   rename(nrc_sentiment = sentiment) 
@@ -137,8 +127,11 @@ speech_sentiment%>%
   geom_bar(stat = "identity", position = 'dodge') + coord_flip() + xlab('')
 ```
 
+```         
+```
 
-```{r LDA, echo=FALSE}
+```{r LDA}
+
 speech_tdf <- speech_tokens%>%
   group_by(Date,word) %>%
   count() %>%  
@@ -147,7 +140,8 @@ speech_tdf <- speech_tokens%>%
 dtm_speech <- speech_tdf %>% 
   cast_dtm(Date, word, n)
 
-speech_lda <- LDA(dtm_speech, k = 2, control = list(seed = 1234))
+lda_model <- LDA(dtm_speech, k = 2, control = list(seed = 1234))
 
-
+# Get the top words for each topic
+top_words_per_topic <- terms(lda_model, 10) 
 ```
