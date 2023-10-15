@@ -67,6 +67,8 @@ speech_tibble <- speech_tibble %>%
 speech_tibble <- speech_tibble %>%
   mutate(
     content = tolower(content),
+    content = gsub("\\d", "", content),
+    content = gsub("[^[:alnum:]']", " ", content),
     content = gsub("[^[:alnum:]']", " ", content),
     day = gsub("[c(,'’\"]", "", day),
     year = gsub("[,'’\"]", "", year)
@@ -77,7 +79,6 @@ speech_tibble$Date[36]<- "9 February 2022"
 speech_tibble$Date<- dmy(speech_tibble$Date)
 
 # Assuming you have already loaded the 'lubridate' package
-
 speech_tibble <- speech_tibble %>%
   mutate(
     President = case_when(
@@ -93,6 +94,14 @@ speech_tibble <- speech_tibble %>%
 speech_tokens <- speech_tibble %>%
   unnest_tokens(word, content) %>%
   anti_join(stop_words)
+
+words_to_remove <- c("government", "South Africa", "national",
+                     "country", "south", "africa", "honourable", 
+                     "people")
+
+speech_tokens <- speech_tokens %>%
+  filter(!word %in% words_to_remove)
+
 
 load("dsfi-lexicons.Rdata")
 
@@ -147,7 +156,43 @@ speech_tdf <- speech_tokens%>%
 dtm_speech <- speech_tdf %>% 
   cast_dtm(Date, word, n)
 
-speech_lda <- LDA(dtm_speech, k = 2, control = list(seed = 1234))
+speech_lda <- LDA(dtm_speech, k = 36, control = list(seed = 2023))
+
+speech_topics <- tidy(speech_lda, matrix = 'beta')
+
+
+speech_topics %>%
+  group_by(topic) %>%
+  slice_max(n = 1, order_by = beta) %>% ungroup() %>%
+  arrange(topic, -beta) %>%
+  ggplot(aes(reorder(term, beta), beta, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = 'free') + coord_flip()
+
+```
+
+```{r, echo =FALSE}
+speech_tdf_presidents <- speech_tokens%>%
+  group_by(President,word) %>%
+  count() %>%  
+  ungroup() 
+
+dtm_speech_presidents <- speech_tdf_presidents %>% 
+  cast_dtm(President, word, n)
+
+speech_lda_presidents<- LDA(dtm_speech_presidents, k = 5, control = list(seed = 2023))
+
+speech_topics_presidents <- tidy(speech_lda_presidents, matrix = 'beta')
+
+
+speech_topics_presidents %>%
+  group_by(topic) %>%
+  slice_max(n = 20, order_by = beta) %>% ungroup() %>%
+  arrange(topic, -beta) %>%
+  ggplot(aes(reorder(term, beta), beta, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = 'free') + coord_flip()
+
 
 
 ```
