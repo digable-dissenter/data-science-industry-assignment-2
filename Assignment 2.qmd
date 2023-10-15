@@ -9,7 +9,7 @@ editor: visual
 
 ```{r setup, include=FALSE}
 
-knitr::opts_knit$set(root.dir = "C:/Users/levyb/Documents/Masters Data Science - 1st Year/DS4I/Assignment_2/ds4l-assignment-2/data/")
+knitr::opts_knit$set(root.dir = "C:/Users/User/OneDrive/Documents/School/2023/Masters/STA5073Z/Assignments/Assignment 2/ds4l-assignment-2/data/")
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, fig.pos = "H", out.extra = "")
 ```
@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, fig.pos = "H", out.extra = 
 rm(list=ls())
 
 # Libraries we need
-libs <- c('kableExtra', 'stringr', 'tidyverse')
+libs <- c('dplyr', 'ggplot2', 'lubridate', 'purrr', 'reshape2', 'text2vec', 'tidyr', 'tidytext', 'topicmodels', 'tm', 'wordcloud')
 
 # Install missing libraries
 installed_libs <- libs %in% rownames(installed.packages())
@@ -50,16 +50,8 @@ for (file in text_files) {
 
 ```
 
-```{r}
+```{r wrangling}
 #data wrangling 
-library(tidytext)
-library(dplyr)
-library(tidyr)
-library(lubridate)
-library(ggplot2)
-library(tm)
-library(topicmodels)
-
 speech_tibble <- tibble(speech = speech_data)
 speech_tibble <- speech_tibble %>%
   separate(speech, into = c("day", "month" , "year","content"), sep = " ",fill= "right", extra = "merge")
@@ -145,7 +137,6 @@ speech_sentiment%>%
   ggplot(aes(reorder(nrc_sentiment, mean_prop), mean_prop, fill = President)) + 
   geom_bar(stat = "identity", position = 'dodge') + coord_flip() + xlab('')
 ```
-
 
 ```{r LDA, echo=FALSE}
 speech_tdf <- speech_tokens%>%
