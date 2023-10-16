@@ -2,9 +2,10 @@
 title: "Data Science for Industry: Assignment 2"
 author: "Kenneth Ssekimpi & Levy Banda"
 student_number: "SSKKEN001 & BNDLEV001"
-ssignment: "Assignment 2"
+assignment: "Assignment 2"
 format: pdf
 editor: visual
+embed-resources: true
 ---
 
 ```{r setup, include=FALSE}
@@ -40,7 +41,7 @@ unzip("sona-addresses-1994-2023.zip")
 text_files <- list.files(pattern = ".txt")
 
 # Initialize an empty list to store the data
-speech_data <- list()
+speech_data <- list()s
 
 # Loop through the list of text files and read them into R
 for (file in text_files) {
@@ -74,14 +75,14 @@ speech_tibble$Date<- dmy(speech_tibble$Date)
 speech_tibble <- speech_tibble %>%
   mutate(
     President = case_when(
-      Date < ymd("1999-06-14") ~ "Nelson Mandela",
+      Date == ymd("1994-02-28") ~ "F.W. de Klerk",
+      Date > ymd("1994-02-28") & Date < ymd("1999-06-14") ~ "Nelson Mandela",
       Date >= ymd("1999-06-14") & Date < ymd("2008-09-24") ~ "Thabo Mbeki",
       Date >= ymd("2008-09-24") & Date <= ymd("2009-05-09") ~ "Kgalema Motlanthe",
       Date >= ymd("2009-05-09") & Date <= ymd("2018-02-14") ~ "Jacob Zuma",
       TRUE ~ "Cyril Ramaphosa"
     )
   )
-
 
 speech_tokens <- speech_tibble %>%
   unnest_tokens(word, content) %>%
@@ -99,7 +100,7 @@ load("dsfi-lexicons.Rdata")
 
 ```
 
-```{r bing sentiment,echo = FALSE}
+```{r bing sentiment}
 speech_sentiment <- speech_tokens %>% 
   left_join(bing, by = "word") %>%
   rename(bing_sentiment = sentiment) %>%
@@ -122,7 +123,7 @@ speech_sentiment %>%
 
 ```
 
-```{r nrc, echo = FALSE}
+```{r nrc}
 speech_sentiment <- speech_sentiment %>% 
   left_join(nrc, by = "word") %>%
   rename(nrc_sentiment = sentiment) 
@@ -138,7 +139,7 @@ speech_sentiment%>%
   geom_bar(stat = "identity", position = 'dodge') + coord_flip() + xlab('')
 ```
 
-```{r LDA, echo=FALSE}
+```{r LDA}
 speech_tdf <- speech_tokens%>%
   group_by(Date,word) %>%
   count() %>%  
@@ -162,7 +163,7 @@ speech_topics %>%
 
 ```
 
-```{r, echo =FALSE}
+```{r}
 speech_tdf_presidents <- speech_tokens%>%
   group_by(President,word) %>%
   count() %>%  
@@ -183,7 +184,7 @@ speech_topics_presidents %>%
   ggplot(aes(reorder(term, beta), beta, fill = factor(topic))) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~ topic, scales = 'free') + coord_flip()
+```
 
-
-
+```         
 ```
