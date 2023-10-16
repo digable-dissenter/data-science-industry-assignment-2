@@ -3,7 +3,7 @@ title: "Data Science for Industry: Assignment 2"
 author: "Kenneth Ssekimpi & Levy Banda"
 student_number: "SSKKEN001 & BNDLEV001"
 assignment: "Assignment 2"
-format: pdf
+format: jmlr-pdf
 editor: visual
 embed-resources: true
 ---
@@ -13,6 +13,7 @@ embed-resources: true
 knitr::opts_knit$set(root.dir = "C:/Users/User/OneDrive/Documents/School/2023/Masters/STA5073Z/Assignments/Assignment 2/ds4l-assignment-2/data/")
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, fig.pos = "H", out.extra = "")
+
 ```
 
 ```{r}
@@ -20,7 +21,7 @@ knitr::opts_chunk$set(echo = FALSE, warning = FALSE, fig.pos = "H", out.extra = 
 rm(list=ls())
 
 # Libraries we need
-libs <- c('dplyr', 'ggplot2', 'lubridate', 'purrr', 'reshape2', 'text2vec', 'tidyr', 'tidytext', 'topicmodels', 'tm', 'wordcloud')
+libs <- c('dplyr', 'ggplot2', 'lubridate', 'purrr', 'reshape2', 'stringr', 'text2vec', 'tidyr', 'tidytext', 'topicmodels', 'tm', 'wordcloud')
 
 # Install missing libraries
 installed_libs <- libs %in% rownames(installed.packages())
@@ -36,56 +37,95 @@ invisible(lapply(libs, library, character.only = TRUE))
 unzip("sona-addresses-1994-2023.zip")
 ```
 
-```{r}
+```{r read_wrangle}
 # Get a list of all text files in the directory
 text_files <- list.files(pattern = ".txt")
+# filenames <- purrr::flatten(text_files)
 
 # Initialize an empty list to store the data
-speech_data <- list()s
-
+# speech_data <- list()
+speech_data <- c()
+i = 0
+num_chars <- c(27050, 12786, 39019, 39524, 37489, 45247, 34674, 41225, 37552, 41719, 50544, 58284, 34590, 39232, 54635, 48643, 48641, 44907, 31101, 47157, 26384, 33281, 33376, 36006, 29403, 36233, 32860, 32464, 35981, 33290, 42112, 56960, 47910, 43352, 52972, 52972)
 # Loop through the list of text files and read them into R
 for (file in text_files) {
-  speech <- readLines(file, warn = FALSE)
-  speech_data[[file]] <- speech
+  i = i + 1
+  # speech <- readLines(file, warn = FALSE)
+  speech <- readChar(file, nchars = num_chars[i])
+  # speech_data[[file]] <- speech
+  speech_data[i] <- speech
 }
+
+sona <- data.frame(filename = text_files, speech = speech_data, stringsAsFactors = FALSE)
+
+# extract year and president for each speech
+sona$year <- str_sub(sona$filename, start = 1, end = 4)
+sona$president <- str_remove_all(str_extract(sona$filename, "[dA-Z].*\\."), "\\.")
+
+# clean the sona dataset by adding the date and removing unnecessary text
+replace_reg <- '(http.*?(\\s|.$))|(www.*?(\\s|.$))|&amp;|&lt;|&gt;|\n'
+
+sona <-sona %>%
+  mutate(speech = str_replace_all(speech, replace_reg , ' ')
+         ,date = str_sub(speech, start=1, end=30)
+         ,date = str_replace_all(date, "February", "02")
+         ,date = str_replace_all(date, "June", "06")
+         ,date = str_replace_all(date, "Feb", "02")
+         ,date = str_replace_all(date, "May", "05")
+         ,date = str_replace_all(date, "Jun", "06")
+         ,date = str_replace_all(date, "Thursday, ","")
+         ,date = str_replace_all(date, ' ', '-')        
+         ,date = str_replace_all(date, "[A-z]",'')
+         ,date = str_replace_all(date, '-----', '')
+         ,date = str_replace_all(date, '----', '')
+         ,date = str_replace_all(date, '---', '')
+         ,date = str_replace_all(date, '--', '')
+  )
+
+sona$date[36] <- "09-02-2023"
+sona$year[36] <- "2023"
+
+sona$date <- dmy(sona$date)
 
 ```
 
-```{r wrangling}
-#data wrangling 
-speech_tibble <- tibble(speech = speech_data)
-speech_tibble <- speech_tibble %>%
-  separate(speech, into = c("day", "month" , "year","content"), sep = " ",fill= "right", extra = "merge")
+```{r tokenize}
+#data wrangling
+# sona$date <- dmy(sona$date)
 
-speech_tibble <- speech_tibble %>%
-  mutate(
-    content = tolower(content),
-    content = gsub("\\d", "", content),
-    content = gsub("[^[:alnum:]']", " ", content),
-    content = gsub("[^[:alnum:]']", " ", content),
-    day = gsub("[c(,'’\"]", "", day),
-    year = gsub("[,'’\"]", "", year)
-  ) %>% unite("Date", day:month:year, remove = TRUE, sep = " ")
+#speech_tibble <- tibble(speech = speech_data)
+#speech_tibble <- speech_tibble %>%
+#  separate(speech, into = c("day", "month" , "year", "content"), sep = " ",fill= "right", extra = "merge")
 
-speech_tibble$Date[35]<- "10 February 2022"
-speech_tibble$Date[36]<- "9 February 2022"
-speech_tibble$Date<- dmy(speech_tibble$Date)
+# speech_tibble <- speech_tibble %>%
+#   mutate(
+#     content = tolower(content),
+#     content = gsub("\\d", "", content),
+#     content = gsub("[^[:alnum:]']", " ", content),
+#     content = gsub("[^[:alnum:]']", " ", content),
+#     day = gsub("[c(,'’\"]", "", day),
+#     year = gsub("[,'’\"]", "", year)
+#   ) %>% unite("Date", day:month:year, remove = TRUE, sep = " ")
+# 
+# # speech_tibble$Date[35]<- "10 February 2022"
+# # speech_tibble$Date[36]<- "9 February 2022"
+# # speech_tibble$Date<- dmy(speech_tibble$Date)
+# 
+# # Assuming you have already loaded the 'lubridate' package
+# speech_tibble <- speech_tibble %>%
+#   mutate(
+#     President = case_when(
+#       Date == ymd("1994-02-28") ~ "F.W. de Klerk",
+#       Date > ymd("1994-02-28") & Date < ymd("1999-06-14") ~ "Nelson Mandela",
+#       Date >= ymd("1999-06-14") & Date < ymd("2008-09-24") ~ "Thabo Mbeki",
+#       Date >= ymd("2008-09-24") & Date <= ymd("2009-05-09") ~ "Kgalema Motlanthe",
+#       Date >= ymd("2009-05-09") & Date <= ymd("2018-02-14") ~ "Jacob Zuma",
+#       TRUE ~ "Cyril Ramaphosa"
+#     )
+#   )
 
-# Assuming you have already loaded the 'lubridate' package
-speech_tibble <- speech_tibble %>%
-  mutate(
-    President = case_when(
-      Date == ymd("1994-02-28") ~ "F.W. de Klerk",
-      Date > ymd("1994-02-28") & Date < ymd("1999-06-14") ~ "Nelson Mandela",
-      Date >= ymd("1999-06-14") & Date < ymd("2008-09-24") ~ "Thabo Mbeki",
-      Date >= ymd("2008-09-24") & Date <= ymd("2009-05-09") ~ "Kgalema Motlanthe",
-      Date >= ymd("2009-05-09") & Date <= ymd("2018-02-14") ~ "Jacob Zuma",
-      TRUE ~ "Cyril Ramaphosa"
-    )
-  )
-
-speech_tokens <- speech_tibble %>%
-  unnest_tokens(word, content) %>%
+speech_tokens <- sona %>%
+  unnest_tokens(word, speech) %>%
   anti_join(stop_words)
 
 words_to_remove <- c("government", "South Africa", "national",
@@ -109,49 +149,48 @@ speech_sentiment <- speech_tokens %>%
 #5 most positive words for each movie
 speech_sentiment %>%
   filter(bing_sentiment == 'positive') %>%
-  count(President, word) %>%
-  group_by(President) %>% filter(rank(desc(n)) <= 5) %>%
-  ggplot(aes(reorder(word,n),n)) + geom_col() + facet_wrap(~President)+
+  count(president, word) %>%
+  group_by(president) %>% filter(rank(desc(n)) <= 5) %>%
+  ggplot(aes(reorder(word,n),n)) + geom_col() + facet_wrap(~president)+
   coord_flip() + xlab('')
 
 #5 most negative words for each movie
 speech_sentiment %>%
   filter(bing_sentiment == 'negative') %>%
-  count(President, word) %>%
-  group_by(President) %>% filter(rank(desc(n)) <= 5) %>%
-  ggplot(aes(reorder(word,n),n)) + geom_col() + facet_wrap(~President) + coord_flip() + xlab('')
+  count(president, word) %>%
+  group_by(president) %>% filter(rank(desc(n)) <= 5) %>%
+  ggplot(aes(reorder(word,n),n)) + geom_col() + facet_wrap(~president) + coord_flip() + xlab('')
 
 ```
 
 ```{r nrc}
-speech_sentiment <- speech_sentiment %>% 
-  left_join(nrc, by = "word") %>%
-  rename(nrc_sentiment = sentiment) 
+#speech_sentiment <- speech_sentiment %>% 
+#  left_join(nrc, by = "word") # %>%
+  # rename(nrc_sentiment = sentiment) 
 
 speech_sentiment%>%
-  add_count(President,Date, name = "n_words") %>%
+  add_count(president,date, name = "n_words") %>%
   na.omit() %>%
-  group_by(President,Date, nrc_sentiment) %>%
+  group_by(president,date, nrc_sentiment) %>%
   summarize(prop = n() / first(n_words)) %>% ungroup() %>%
-  group_by(President, nrc_sentiment) %>%
+  group_by(president, nrc_sentiment) %>%
   summarize(mean_prop = mean(prop)) %>% ungroup() %>%
-  ggplot(aes(reorder(nrc_sentiment, mean_prop), mean_prop, fill = President)) + 
+  ggplot(aes(reorder(nrc_sentiment, mean_prop), mean_prop, fill = president)) + 
   geom_bar(stat = "identity", position = 'dodge') + coord_flip() + xlab('')
 ```
 
 ```{r LDA}
 speech_tdf <- speech_tokens%>%
-  group_by(Date,word) %>%
+  group_by(date,word) %>%
   count() %>%  
   ungroup() 
 
 dtm_speech <- speech_tdf %>% 
-  cast_dtm(Date, word, n)
+  cast_dtm(date, word, n)
 
 speech_lda <- LDA(dtm_speech, k = 36, control = list(seed = 2023))
 
 speech_topics <- tidy(speech_lda, matrix = 'beta')
-
 
 speech_topics %>%
   group_by(topic) %>%
@@ -165,12 +204,12 @@ speech_topics %>%
 
 ```{r}
 speech_tdf_presidents <- speech_tokens%>%
-  group_by(President,word) %>%
+  group_by(president,word) %>%
   count() %>%  
   ungroup() 
 
 dtm_speech_presidents <- speech_tdf_presidents %>% 
-  cast_dtm(President, word, n)
+  cast_dtm(president, word, n)
 
 speech_lda_presidents<- LDA(dtm_speech_presidents, k = 5, control = list(seed = 2023))
 
@@ -184,7 +223,4 @@ speech_topics_presidents %>%
   ggplot(aes(reorder(term, beta), beta, fill = factor(topic))) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~ topic, scales = 'free') + coord_flip()
-```
-
-```         
 ```
