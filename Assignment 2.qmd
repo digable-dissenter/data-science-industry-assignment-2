@@ -26,7 +26,7 @@ The implementation of data mining analysis techniques, such as topic modeling an
 
 ## Sentiment Analysis 
 
-Studies such as [@budiharto2018prediction] have suggested frameworks into using sentiment analysis on posts on relevant topics on some social media websites to predict election results. Sentiment analysis can also be used to determine the mood of the nation by monitoring announcements made by leaders of the country, including presidential candidates [@vo2017multi]. [@bringula2023youtube] analyzed comments on Youtube to analyze opinions from political vloggers about two presidential canditates. Sentiment analysis can be used to summarize political issues and current affairs [@bollen2011modeling]. [@miranda2021exploring] studied the the State of the Nation Addresses of the last 13 Philippine presidents and discovered that the speeches had huge focus towards economic development, enhancement of public services, and addressing issues faced by the nation.
+Studies such as [@budiharto2018prediction] have suggested frameworks into using sentiment analysis on posts on relevant topics on some social media websites to predict election results. Sentiment analysis can also be used to determine the mood of the nation by monitoring announcements made by leaders of the country, including presidential candidates [@vo2017multi]. [@bringula2023youtube] analyzed comments on Youtube to analyze opinions from political vloggers about two presidential canditates. Sentiment analysis can be used to summarize political issues and current affairs [@bollen2011modeling]. [@miranda2021exploring] studied State of the Nation Addresses of 13 Philippine presidents and discovered that the speeches had huge focus towards economic development, enhancement of public services, and addressing issues faced by the nation.
 
 # Data and Methodology
 
@@ -40,7 +40,7 @@ removed:  shifting the focus to  content-carrying words, enhancing the identific
 
 ## Sentiment Analysis
 The aim of the sentiment analysis is to determine the emotional tonality expressed in the State of the Nation Address. At the core of this sentiment analysis lies the sentiment lexicon—a dictionary that associates words or phrases with sentiment scores.
-In this paper, three different lexicons found in the 'tidyr' package were used: AFINN, bing and nrc. The AFINN (\href{http://www2.imm.dtu.dk/pubdb/pubs/6010-full.html}{Finn Årup Nielsen}) assigns a score to each word in the topic with -5 being the most negative and 5 being the most postive score. From \href{https:rh//www.cs.uic.edu/~liub/FBS/sentiment-analysis.html}{Bing Lui and collaborators} , the bing lexicon assigns each word in the tolkenized speeches as either negative or positive according to the lexicon association. From \href{http://saifmohammad.com/WebPages/NRC-Emotion-Lexicon.htm}{Saif Mohammad and Peter Turney}, the nrc lexicon assigns each word in the tolkenized speeches into categories of positive, negative, anger, anticipation, disgust, fear, joy, sadness, surprise, and trust. 
+In this paper, three different lexicons found in the 'tidyr' package were used: AFINN, bing and nrc. The AFINN lexicon assigns a score to each word in the topic with -5 being the most negative and 5 being the most postive score.The bing lexicon assigns each word in the tolkenized speeches as either negative or positive according to the lexicon association. The nrc lexicon assigns each word in the tolkenized speeches into categories of positive, negative, anger, anticipation, disgust, fear, joy, sadness, surprise, and trust. 
 
  
 # Results 
@@ -190,7 +190,6 @@ speech_sentiment <- speech_tokens %>%
 ```
 
 ```{r, echo = FALSE}
-
 #| label: fig-positive
 #| fig-cap: "Most positive words used by each President"
 
@@ -202,10 +201,10 @@ speech_sentiment %>%
   coord_flip() + labs( y = 'Contribution to Sentiment')
 ```
 
-```{r, echo = FALSE}
-#| label : fig-negative_words
-#| fig-cap: "Most negative words used by each President"
 
+```{r, echo = FALSE}
+#| label: fig-nwords
+#| fig-cap: "Most Negative words used by each President"
 speech_sentiment %>%
   filter(bing_sentiment == 'negative') %>%
   count(President, word) %>%
@@ -215,20 +214,9 @@ speech_sentiment %>%
 
 ```
 
-```{r, echo = FALSE}
-#| label: fig-word_cloud
-#| fig-cap : "Word Cloud"
-
-speech_tokens%>%
-  anti_join(stop_words) %>%
-  count(word) %>%
-  with(wordcloud(word, n, max.words = 100, color = "random dark",
-                 ordered.colors = TRUE))
-```
-
 We can see from Figure @fig-positive that positive words such as 'reconciliation', 'freedom', 'progress', and 'improve' were commonly occurring in speeches made by Nelson Mandela. The word occurence of 'support' in the speeches seems to be increasing as we move towards the most recent president, Cyril Ramaphosa.
 
-Figure @fig-negative shows that most negative words used in each of the presidents. This may highlight some of the issues each president had experienced during their tenure. 'Crime' seems to be a word with one of the most commonly occurring in speeches made by Nelson Mandela, Thabo Mbeki, and Jacob Zuma. 'Poverty' is the most occuring negative word in Thabo Mbeki's speeches and also significant in Jacob Zuma's, and Cyril Ramaphosa's speeches. 
+Figure @fig-nwords shows that most negative words used in each of the presidents. This may highlight some of the issues each president had experienced during their tenure. 'Crime' seems to be a word with one of the most commonly occurring in speeches made by Nelson Mandela, Thabo Mbeki, and Jacob Zuma. 'Poverty' is the most occuring negative word in Thabo Mbeki's speeches and also significant in Jacob Zuma's, and Cyril Ramaphosa's speeches. 
 
 ```{r nrc, echo = FALSE}
 speech_sentiment <- speech_sentiment %>% 
@@ -236,7 +224,7 @@ speech_sentiment <- speech_sentiment %>%
   rename(nrc_sentiment = sentiment) 
 ```
 
-```{r overall, echo = FALSE }
+```{r overall, echo = FALSE, warning=FALSE}
 #| label: fig-overall
 #| fig-cap: "Proportion of sentiment words in speeches for each President"
 
@@ -244,16 +232,16 @@ speech_sentiment%>%
   add_count(President,Date, name = "n_words") %>%
   na.omit() %>%
   group_by(President,Date, nrc_sentiment) %>%
-  summarize(prop = n() / first(n_words)) %>% ungroup() %>%
+  summarize(.groups = "drop", prop = n() / first(n_words)) %>% ungroup() %>%
   group_by(President, nrc_sentiment) %>%
-  summarize(mean_prop = mean(prop)) %>% ungroup() %>%
+  summarize(.groups = "drop", mean_prop = mean(prop)) %>% ungroup() %>%
   ggplot(aes(reorder(nrc_sentiment, mean_prop), mean_prop, fill = President)) + 
   geom_bar(stat = "identity", position = 'dodge') + coord_flip()+labs(y = "", x = "Sentiment Words")
 ```
 
 Figure @fig-overall indicates the proportion of sentiment words, categorized using the nrc lexicon, for each of the presidents. Nelson Mandela's speeches have the highest proportion of positive sentiment while De Klerk's speeches have the the highest negative sentiment. Nelson Mandela's speeches have a relatively high proportion of words associated with anticipation, and fear, but also of joy and trust. 
 
-```{r, echo = FALSE }
+```{r, echo = FALSE, warning=FALSE}
 #| label: fig-sentimentscore
 #| fig-cap: "Time series Plot of Average Sentiment using AFINN Lexicon Scoring System. Higher Values Represent more Positive Sentiment" 
 
@@ -262,7 +250,7 @@ speech_sentiment <- speech_sentiment %>%
   rename(afinn_value = value) 
 
 speech_sentiment%>%select(Date, President, word, afinn_value)%>%na.omit%>% 
-  group_by(Date, President) %>%summarise(Mean_Score = mean(afinn_value)) %>%ungroup() %>% 
+  group_by( Date, President) %>%summarise(.groups = "drop", Mean_Score = mean(afinn_value)) %>%ungroup() %>% 
   ggplot(aes(x = Date, y = Mean_Score, col = President))+ geom_line() +
   labs(title = "Average Sentiment Score Time Series", x = "Date", y = " Average Sentiment Score") +
   theme_minimal()
