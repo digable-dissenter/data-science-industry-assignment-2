@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Kenneth Ssekimpi &amp; Levy Banda">
+
+<title>Data Science for Industry: Assignment 2</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+
+<script src="Assignment 2_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Assignment 2_files/libs/quarto-html/quarto.js"></script>
+<script src="Assignment 2_files/libs/quarto-html/popper.min.js"></script>
+<script src="Assignment 2_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Assignment 2_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Assignment 2_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Assignment 2_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Assignment 2_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Assignment 2_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Assignment 2_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Data Science for Industry: Assignment 2</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Kenneth Ssekimpi &amp; Levy Banda </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>The State of the Nation Address (SONA) in South Africa serves as an opportunity for the President to address the nation and provide an overview of the government’s accomplishments, plans, and priorities. This speech marks the opening of Parliament. It is an important political event and a key moment for the President to communicate the government’s agenda to the South African Parliament (National Assembly and National Council of Provinces) <span class="citation" data-cites="sagov">(<a href="#ref-sagov" role="doc-biblioref"><span>“State of the Nation Address,”</span> n.d.</a>)</span>. At the SONA, the President of South Africa is able to not only inform the nation of the economic and political policies rot be carried out, but also encourage South Africans, bringing hope and inspiring confidence in government. For example, after the South African National Rugby team won the Rugby World Cup in 2019, President Cryril Ramaphosa congratulated the team on their achievement and highlighted the pride this brought to the country during his SONA at the beginning of 2020 <span class="citation" data-cites="sagov">(<a href="#ref-sagov" role="doc-biblioref"><span>“State of the Nation Address,”</span> n.d.</a>)</span>.</p>
+<p>Democratic governance can be seen at SONA’s, as the President exposes the problems the country is currently facing and possibly provides an account on what is being done to solve them <span class="citation" data-cites="eshbaugh2010politics">(<a href="#ref-eshbaugh2010politics" role="doc-biblioref">Eshbaugh-Soha 2010</a>)</span>. <span class="citation" data-cites="banguis2019role">(<a href="#ref-banguis2019role" role="doc-biblioref">Banguis-Bantawig 2019</a>)</span> highlighted that speeches made by Asian Presidents revealed a lot of information about the state of affairs in the periods studied.</p>
+<p>The implementation of data mining analysis techniques, such as topic modeling and sentiment analysis, allows for a more profound examination and comprehension of past State of the Nation Addresses (SONAs). Data mining offers the opportunity to gain insights into the challenges faced by previous leaders and to evaluate the ongoing relevance of these issues in contemporary contexts <span class="citation" data-cites="miranda2021exploring">(<a href="#ref-miranda2021exploring" role="doc-biblioref">Miranda and Bringula 2021</a>)</span></p>
+</section>
+<section id="literature-review" class="level1">
+<h1>Literature Review</h1>
+<section id="sentiment-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="sentiment-analysis">Sentiment Analysis</h2>
+<p>Studies such as <span class="citation" data-cites="budiharto2018prediction">(<a href="#ref-budiharto2018prediction" role="doc-biblioref">Budiharto and Meiliana 2018</a>)</span> have suggested frameworks into using sentiment analysis on posts on relevant topics on some social media websites to predict election results. Sentiment analysis can also be used to determine the mood of the nation by monitoring announcements made by leaders of the country, including presidential candidates <span class="citation" data-cites="vo2017multi">(<a href="#ref-vo2017multi" role="doc-biblioref">Vo et al. 2017</a>)</span>. <span class="citation" data-cites="bringula2023youtube">(<a href="#ref-bringula2023youtube" role="doc-biblioref">Bringula et al. 2023</a>)</span> analyzed comments on Youtube to analyze opinions from political vloggers about two presidential canditates. Sentiment analysis can be used to summarize political issues and current affairs <span class="citation" data-cites="bollen2011modeling">(<a href="#ref-bollen2011modeling" role="doc-biblioref">Bollen, Mao, and Pepe 2011</a>)</span>. <span class="citation" data-cites="miranda2021exploring">(<a href="#ref-miranda2021exploring" role="doc-biblioref">Miranda and Bringula 2021</a>)</span> studied State of the Nation Addresses of 13 Philippine presidents and discovered that the speeches had huge focus towards economic development, enhancement of public services, and addressing issues faced by the nation.</p>
+</section>
+</section>
+<section id="data-and-methodology" class="level1">
+<h1>Data and Methodology</h1>
+<section id="data-preprocessing" class="level2">
+<h2 class="anchored" data-anchor-id="data-preprocessing">Data Preprocessing</h2>
+<p>The full text of State of the Nation Address (SONA) speeches, from 1994 to 2023, was collected from the official South African Governement website. Data preprocessing is an essential phase in text analysis, aimed at transforming the raw text data into a structured format suitable for in-depth analysis of the speeches. For this we chose the ‘tidytext’ package found in R programming language which provided a versatile platform for text analysis</p>
+<p>The initial step in data preprocessing was to identify the date of the speech and the President who addressed the nation. Following this was the removal of special characters, digits and punctuation marks. Elements, such as symbols, commas, periods, and question marks, can introduce noise into the text and hinder accurate analysis. Numerical values and digits hold limited relevance and may disrupt the analysis of textual content. Their exclusion simplifies the text, making it more text-centric.</p>
+<p>To extract meaningful information from the text, tokenization is employed. It involves breaking down the continuous string of text into individual units, known as tokens, usually words or phrases. Tokenization provides the foundation for understanding the text’s structure and content, making it more amenable to analysis. All the characters in the text are converted to lower case. This ensures that the analysis is not case sensitive. Stop words, commonly occurring words that hold not much meaning, are removed: shifting the focus to content-carrying words, enhancing the identification of significant themes and patterns in the SONA speeches.</p>
+</section>
+<section id="sentiment-analysis-1" class="level2">
+<h2 class="anchored" data-anchor-id="sentiment-analysis-1">Sentiment Analysis</h2>
+<p>The aim of the sentiment analysis is to determine the emotional tonality expressed in the State of the Nation Address. At the core of this sentiment analysis lies the sentiment lexicon—a dictionary that associates words or phrases with sentiment scores. In this paper, three different lexicons found in the ‘tidyr’ package were used: AFINN, bing and nrc. The AFINN lexicon assigns a score to each word in the topic with -5 being the most negative and 5 being the most postive score.The bing lexicon assigns each word in the tolkenized speeches as either negative or positive according to the lexicon association. The nrc lexicon assigns each word in the tolkenized speeches into categories of positive, negative, anger, anticipation, disgust, fear, joy, sadness, surprise, and trust.</p>
+</section>
+</section>
+<section id="results" class="level1">
+<h1>Results</h1>
+<section id="sentiment-analysis-2" class="level2">
+<h2 class="anchored" data-anchor-id="sentiment-analysis-2">Sentiment Analysis</h2>
+<div class="cell">
+
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-positive" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="Assignment-2_files/figure-html/fig-positive-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;1: Most positive words used by each President</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-nwords" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="Assignment-2_files/figure-html/fig-nwords-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;2: Most Negative words used by each President</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We can see from Figure <a href="#fig-positive">Figure&nbsp;1</a> that positive words such as ‘reconciliation’, ‘freedom’, ‘progress’, and ‘improve’ were commonly occurring in speeches made by Nelson Mandela. The word occurence of ‘support’ in the speeches seems to be increasing as we move towards the most recent president, Cyril Ramaphosa.</p>
+<p>Figure <a href="#fig-nwords">Figure&nbsp;2</a> shows that most negative words used in each of the presidents. This may highlight some of the issues each president had experienced during their tenure. ‘Crime’ seems to be a word with one of the most commonly occurring in speeches made by Nelson Mandela, Thabo Mbeki, and Jacob Zuma. ‘Poverty’ is the most occuring negative word in Thabo Mbeki’s speeches and also significant in Jacob Zuma’s, and Cyril Ramaphosa’s speeches.</p>
+<div class="cell">
+
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-overall" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="Assignment-2_files/figure-html/fig-overall-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;3: Proportion of sentiment words in speeches for each President</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Figure <a href="#fig-overall">Figure&nbsp;3</a> indicates the proportion of sentiment words, categorized using the nrc lexicon, for each of the presidents. Nelson Mandela’s speeches have the highest proportion of positive sentiment while De Klerk’s speeches have the the highest negative sentiment. Nelson Mandela’s speeches have a relatively high proportion of words associated with anticipation, and fear, but also of joy and trust.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-sentimentscore" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="Assignment-2_files/figure-html/fig-sentimentscore-1.png" class="img-fluid figure-img" width="672"></p>
+<p></p><figcaption class="figure-caption">Figure&nbsp;4: Time series Plot of Average Sentiment using AFINN Lexicon Scoring System. Higher Values Represent more Positive Sentiment</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Figure <a href="#fig-sentimentscore">Figure&nbsp;4</a> shows a time series plot provides an overview of how sentiments have evolved over the years in the SONA speeches. There is a major spike in postive sentiment in Thabo Mbeke’s address in May 2004 right after his re-election on 14th April 2004. This is followed by a lower average sentiment score for the rest of Mbeki’s State of the Nation Addresses for the his second tenure. There was also a sharp decline in Jacob Zuma’s SONA on 14th February 2003. Since Ramaphosa’s time in office there has been an overall decline in the average sentiment score of the SONA each with the address in February 2022 having the lowest sentiment score since 1994.</p>
+<div style="page-break-after: always;"></div>
+<section id="references" class="level3">
+<h3 class="anchored" data-anchor-id="references">References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<div id="ref-banguis2019role" class="csl-entry" role="doc-biblioentry">
+Banguis-Bantawig, Renalyn. 2019. <span>“The Role of Discourse Markers in the Speeches of Selected Asian Presidents.”</span> <em>Heliyon</em> 5 (3).
+</div>
+<div id="ref-bollen2011modeling" class="csl-entry" role="doc-biblioentry">
+Bollen, Johan, Huina Mao, and Alberto Pepe. 2011. <span>“Modeling Public Mood and Emotion: Twitter Sentiment and Socio-Economic Phenomena.”</span> In <em>Proceedings of the International AAAI Conference on Web and Social Media</em>, 5:450–53. 1.
+</div>
+<div id="ref-bringula2023youtube" class="csl-entry" role="doc-biblioentry">
+Bringula, Rex, Ralf Martin R Tabo, Faye Therese Simone L Alcazar, Jessy Marie I Delica, and Joyce Emmanuelle A Sayson. 2023. <span>“YouTube Videos on the Achievements of Presidential Candidates: Sentiment and Content Analysis.”</span> <em>Journal of Political Marketing</em>, 1–17.
+</div>
+<div id="ref-budiharto2018prediction" class="csl-entry" role="doc-biblioentry">
+Budiharto, Widodo, and Meiliana Meiliana. 2018. <span>“Prediction and Analysis of Indonesia Presidential Election from Twitter Using Sentiment Analysis.”</span> <em>Journal of Big Data</em> 5 (1): 1–10.
+</div>
+<div id="ref-eshbaugh2010politics" class="csl-entry" role="doc-biblioentry">
+Eshbaugh-Soha, Matthew. 2010. <span>“The Politics of Presidential Speeches.”</span> In <em>Congress &amp; the Presidency</em>, 37:1–21. 1. Taylor &amp; Francis.
+</div>
+<div id="ref-miranda2021exploring" class="csl-entry" role="doc-biblioentry">
+Miranda, John Paul P, and Rex P Bringula. 2021. <span>“Exploring Philippine Presidents’ Speeches: A Sentiment Analysis and Topic Modeling Approach.”</span> <em>Cogent Social Sciences</em> 7 (1): 1932030.
+</div>
+<div id="ref-sagov" class="csl-entry" role="doc-biblioentry">
+<span>“State of the Nation Address.”</span> n.d. <a href="https://www.gov.za/state-nation-address">https://www.gov.za/state-nation-address</a>.
+</div>
+<div id="ref-vo2017multi" class="csl-entry" role="doc-biblioentry">
+Vo, Quan-Hoang, Huy-Tien Nguyen, Bac Le, and Minh-Le Nguyen. 2017. <span>“Multi-Channel LSTM-CNN Model for Vietnamese Sentiment Analysis.”</span> In <em>2017 9th International Conference on Knowledge and Systems Engineering (KSE)</em>, 24–29. IEEE.
+</div>
+</div>
+</section>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
