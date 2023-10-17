@@ -173,10 +173,6 @@ speech_sentiment %>%
   filter(bing_sentiment == 'positive') %>%
   count(president, word) %>%
   group_by(president) %>% filter(rank(desc(n)) <= 5) %>%
-  ggplot(aes(reorder(word,n),n)) + geom_col() + facet_wrap(~president)+
-  coord_flip() + xlab('')
-  count(president, word) %>%
-  group_by(president) %>% filter(rank(desc(n)) <= 5) %>%
   ggplot(aes(reorder(word,n),n)) + geom_col(aes(fill = word)) + facet_wrap(~president)+
   coord_flip() + labs( y = 'Contribution to Sentiment')
 ```
@@ -194,9 +190,12 @@ speech_sentiment %>%
 ```
 
 ```{r nrc}
+
 speech_sentiment <- speech_sentiment %>% 
 left_join(nrc, by = "word") %>%
-rename(nrc_sentiment = sentiment) %>% 
+rename(nrc_sentiment = sentiment)
+
+speech_sentiment%>% 
   count(president, word) %>%
   group_by(president) %>% filter(rank(desc(n)) <= 5) %>%
   ggplot(aes(reorder(word,n),n)) + geom_col(aes(fill =word)) + facet_wrap(~president) + coord_flip() + labs( y = 'Contribution to Sentiment')
@@ -216,9 +215,7 @@ speech_sentiment%>%
   add_count(president,date, name = "n_words") %>%
   na.omit() %>%
   group_by(president,date, nrc_sentiment) %>%
-  summarize(prop = n() / first(n_words)) %>% ungroup() %>%
-  group_by(president, nrc_sentiment) %>%
-  summarize(mean_prop = mean(prop)) %>% ungroup() %>%
+  summarize(mean_prop = n() / first(n_words)) %>% ungroup() %>%
   ggplot(aes(reorder(nrc_sentiment, mean_prop), mean_prop, fill = president)) + 
   geom_bar(stat = "identity", position = 'dodge') + coord_flip() + xlab('')
 ```
@@ -227,7 +224,7 @@ speech_sentiment%>%
 speech_tdf <- speech_tokens%>%
   group_by(date,word) %>%
   count() %>%  
-  ungroup() 
+  ungroup()
 
 dtm_speech <- speech_tdf %>% 
   cast_dtm(date, word, n)
@@ -243,12 +240,6 @@ speech_topics %>%
   ggplot(aes(reorder(term, beta), beta, fill = factor(topic))) +
   geom_col(show.legend = FALSE) +
   facet_wrap(~ topic, scales = 'free') + coord_flip()
-  group_by(president,date, nrc_sentiment) %>%
-  summarize(.groups = "drop", prop = n() / first(n_words)) %>% ungroup() %>%
-  group_by(president, nrc_sentiment) %>%
-  summarize(.groups = "drop", mean_prop = mean(prop)) %>% ungroup() %>%
-  ggplot(aes(reorder(nrc_sentiment, mean_prop), mean_prop, fill = president)) + 
-  geom_bar(stat = "identity", position = 'dodge') + coord_flip()+labs(y = "", x = "Sentiment Words")
 ```
 
 Figure @fig-overall indicates the proportion of sentiment words, categorized using the nrc lexicon, for each of the presidents. Nelson Mandela's speeches have the highest proportion of positive sentiment while De Klerk's speeches have the the highest negative sentiment. Nelson Mandela's speeches have a relatively high proportion of words associated with anticipation, and fear, but also of joy and trust. 
@@ -272,28 +263,6 @@ speech_sentiment%>%
   theme_minimal()
 ```
 
-```{r}
-speech_tdf_presidents <- speech_tokens%>%
-  group_by(president,word) %>%
-  count() %>%  
-  ungroup() 
-
-dtm_speech_presidents <- speech_tdf_presidents %>% 
-  cast_dtm(president, word, n)
-
-speech_lda_presidents<- LDA(dtm_speech_presidents, k = 5, control = list(seed = 2023))
-
-speech_topics_presidents <- tidy(speech_lda_presidents, matrix = 'beta')
-
-
-speech_topics_presidents %>%
-  group_by(topic) %>%
-  slice_max(n = 20, order_by = beta) %>% ungroup() %>%
-  arrange(topic, -beta) %>%
-  ggplot(aes(reorder(term, beta), beta, fill = factor(topic))) +
-  geom_col(show.legend = FALSE) +
-  facet_wrap(~ topic, scales = 'free') + coord_flip()
-```
 
 Figure @fig-sentimentscore shows a time series plot provides an overview of how sentiments have evolved over the years in the SONA speeches. There is a major spike in postive sentiment in Thabo Mbeke's address in May 2004 right after his re-election on 14th April 2004. This is followed by a lower average sentiment score for the rest of Mbeki's State of the Nation Addresses for the his second tenure. There was also a sharp decline in Jacob Zuma's SONA on 14th February 2003. Since Ramaphosa's time in office there has been an overall decline in the average sentiment score of the SONA each with the address in February 2022 having the lowest sentiment score since 1994. 
 
