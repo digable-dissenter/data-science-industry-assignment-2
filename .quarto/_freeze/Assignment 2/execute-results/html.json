@@ -1,0 +1,16 @@
+{
+  "hash": "51a94be26214b8e39e83ba26981ff210",
+  "result": {
+    "markdown": "---\ntitle: \"A Descriptive Analysis of SONA speeches 1994-2023\"\nauthor: \"Kenneth Ssekimpi & Levy Banda\"\nstudent_number: \"SSKKEN001 & BNDLEV001\"\nassignment: \"Assignment 2\"\nformat: html\neditor: visual\nembed-resources: true\nfonts: Times New Roman\nbibliography: references.bib\nexecute:\n  echo: false\n  warning: false\n---\n\n\n\n::: {.cell}\n\n:::\n\n::: {.cell}\n\n:::\n\n\n# A Descriptive Analysis of SONA speeches 1994-2023\n\n## Abstract\n\nThis is a concise summary of our paper...\n\n## Keywords\n\n## Introduction\n\nThis section provides more detailed background information on our topic...\n\n## Literature review\n\n...\n\n## Data and methods\n\nThis section describes how we conducted our study...\n\n## Results\n\nThis sections presents the results of our study...\n\n## Discussion\n\nThis section interprets our results and discusses their implications...\n\n## Conclusion\n\nThis section summarizes the main findings of our study and states the conclusions that can be drawn from the data...\n\n## References\n\nThis section lists all of the sources that we cited in our paper...\n\n\n::: {.cell}\n\n:::\n\n::: {.cell}\n\n:::\n\n::: {.cell}\n::: {.cell-output-display}\n![](Assignment-2_files/figure-html/bing sentiment-1.png){fig-pos='H' width=672}\n:::\n\n::: {.cell-output-display}\n![](Assignment-2_files/figure-html/bing sentiment-2.png){fig-pos='H' width=672}\n:::\n:::\n\n::: {.cell}\n::: {.cell-output-display}\n![](Assignment-2_files/figure-html/nrc-1.png){fig-pos='H' width=672}\n:::\n:::\n\n::: {.cell}\n::: {.cell-output-display}\n![](Assignment-2_files/figure-html/LDA-1.png){fig-pos='H' width=672}\n:::\n:::\n\n::: {.cell}\n::: {.cell-output-display}\n![](Assignment-2_files/figure-html/unnamed-chunk-2-1.png){fig-pos='H' width=672}\n:::\n:::\n",
+    "supporting": [
+      "Assignment-2_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
