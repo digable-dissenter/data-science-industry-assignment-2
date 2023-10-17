@@ -2,24 +2,57 @@
 title: "Data Science for Industry: Assignment 2"
 author: "Kenneth Ssekimpi & Levy Banda"
 student_number: "SSKKEN001 & BNDLEV001"
-ssignment: "Assignment 2"
-format: pdf
-editor: visual
+Assignment: "Assignment 2"
+bibliography: Reference_list.bib
+format: html
 ---
 
 ```{r setup, include=FALSE}
 
-knitr::opts_knit$set(root.dir = "C:/Users/User/OneDrive/Documents/School/2023/Masters/STA5073Z/Assignments/Assignment 2/ds4l-assignment-2/data/")
+knitr::opts_knit$set(root.dir = "C:/Users/levyb/Documents/Masters Data Science - 1st Year/DS4I/Assignment_2/ds4l-assignment-2/data/")
 
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, fig.pos = "H", out.extra = "")
 ```
 
-```{r}
+# Introduction 
+
+The State of the Nation Address (SONA) in South Africa serves as an opportunity for the President to address the nation and provide an overview of the government's accomplishments, plans, and priorities. This speech marks the opening of Parliament. It is an important political event and a key moment for the President to communicate the government's agenda to the South African Parliament (National Assembly and National Council of Provinces) [@sagov]. At the SONA, the President of South Africa is able to not only inform the nation of the economic and political policies rot be carried out, but also encourage South Africans, bringing hope and inspiring confidence in government. For example, after the South African National Rugby team won the Rugby World Cup in 2019, President Cryril Ramaphosa congratulated the team on their achievement and highlighted the pride this brought to the country during his SONA at the beginning of 2020 [@sagov]. 
+
+Democratic governance can be seen at SONA's, as the President exposes the problems the country is currently facing and possibly provides an account on what is being done to solve them [@eshbaugh2010politics]. [@banguis2019role] highlighted that speeches made by Asian Presidents revealed a lot of information about the state of affairs in the periods studied. 
+
+The implementation of data mining analysis techniques, such as topic modeling and sentiment analysis, allows for a more profound examination and comprehension of past State of the Nation Addresses (SONAs). Data mining offers the opportunity to gain insights into the challenges faced by previous leaders and to evaluate the ongoing relevance of these issues in contemporary contexts [@miranda2021exploring]
+
+# Literature Review 
+
+## Sentiment Analysis 
+
+Studies such as [@budiharto2018prediction] have suggested frameworks into using sentiment analysis on posts on relevant topics on some social media websites to predict election results. Sentiment analysis can also be used to determine the mood of the nation by monitoring announcements made by leaders of the country, including presidential candidates [@vo2017multi]. [@bringula2023youtube] analyzed comments on Youtube to analyze opinions from political vloggers about two presidential canditates. Sentiment analysis can be used to summarize political issues and current affairs [@bollen2011modeling]. [@miranda2021exploring] studied the the State of the Nation Addresses of the last 13 Philippine presidents and discovered that the speeches had huge focus towards economic development, enhancement of public services, and addressing issues faced by the nation.
+
+# Data and Methodology
+
+## Data Preprocessing
+The full text of State of the Nation Address (SONA) speeches, from 1994 to 2023, was collected from the official South African Governement website. Data preprocessing is an essential phase in text analysis, aimed at transforming the raw text data into a structured format suitable for in-depth analysis of the speeches. For this we chose the 'tidytext' package found in R programming language which provided a versatile platform for text analysis
+
+The initial step in data preprocessing was to identify the date of the speech and the President who addressed the nation. Following this was the removal of special characters, digits and punctuation marks. Elements, such as symbols, commas, periods, and question marks, can introduce noise into the text and hinder accurate analysis. Numerical values and digits hold limited relevance and may disrupt the analysis of textual content. Their exclusion simplifies the text, making it more text-centric.
+
+To extract meaningful information from the text, tokenization is employed. It involves breaking down the continuous string of text into individual units, known as tokens, usually words or phrases. Tokenization provides the foundation for understanding the text's structure and content, making it more amenable to analysis. All the characters in the text are converted to lower case. This ensures that the analysis is not case sensitive. Stop words, commonly occurring words that hold not much meaning, are 
+removed:  shifting the focus to  content-carrying words, enhancing the identification of significant themes and patterns in the SONA speeches.
+
+## Sentiment Analysis
+The aim of the sentiment analysis is to determine the emotional tonality expressed in the State of the Nation Address. At the core of this sentiment analysis lies the sentiment lexicon—a dictionary that associates words or phrases with sentiment scores.
+In this paper, three different lexicons found in the 'tidyr' package were used: AFINN, bing and nrc. The AFINN (\href{http://www2.imm.dtu.dk/pubdb/pubs/6010-full.html}{Finn Årup Nielsen}) assigns a score to each word in the topic with -5 being the most negative and 5 being the most postive score. From \href{https:rh//www.cs.uic.edu/~liub/FBS/sentiment-analysis.html}{Bing Lui and collaborators} , the bing lexicon assigns each word in the tolkenized speeches as either negative or positive according to the lexicon association. From \href{http://saifmohammad.com/WebPages/NRC-Emotion-Lexicon.htm}{Saif Mohammad and Peter Turney}, the nrc lexicon assigns each word in the tolkenized speeches into categories of positive, negative, anger, anticipation, disgust, fear, joy, sadness, surprise, and trust. 
+
+ 
+# Results 
+
+## Sentiment Analysis 
+
+```{r, include=FALSE}
 # Clear global environment
 rm(list=ls())
 
 # Libraries we need
-libs <- c('dplyr', 'ggplot2', 'lubridate', 'purrr', 'reshape2', 'text2vec', 'tidyr', 'tidytext', 'topicmodels', 'tm', 'wordcloud')
+libs <- c('dplyr', 'ggplot2', 'lubridate', 'purrr', 'reshape2', 'stringr', 'text2vec', 'tidyr', 'tidytext', 'topicmodels', 'tm', 'wordcloud', "knitr")
 
 # Install missing libraries
 installed_libs <- libs %in% rownames(installed.packages())
@@ -31,26 +64,65 @@ if (any(installed_libs == FALSE)) {
 invisible(lapply(libs, library, character.only = TRUE))
 ```
 
-```{r}
+```{r, include= FALSE}
 unzip("sona-addresses-1994-2023.zip")
 ```
 
-```{r}
+```{r, include= FALSE}
 # Get a list of all text files in the directory
 text_files <- list.files(pattern = ".txt")
+# filenames <- purrr::flatten(text_files)
 
 # Initialize an empty list to store the data
-speech_data <- list()
-
+# speech_data <- list()
+speech_data <- c()
+i = 0
+num_chars <- c(27050, 12786, 39019, 39524, 37489, 45247, 34674, 41225, 37552, 41719, 50544, 58284, 34590, 39232, 54635, 48643, 48641, 44907, 31101, 47157, 26384, 33281, 33376, 36006, 29403, 36233, 32860, 32464, 35981, 33290, 42112, 56960, 47910, 43352, 52972, 52972)
 # Loop through the list of text files and read them into R
 for (file in text_files) {
-  speech <- readLines(file, warn = FALSE)
-  speech_data[[file]] <- speech
+  i = i + 1
+  # speech <- readLines(file, warn = FALSE)
+  speech <- readChar(file, nchars = num_chars[i])
+  # speech_data[[file]] <- speech
+  speech_data[i] <- speech
 }
+
+sona <- data.frame(filename = text_files, speech = speech_data, stringsAsFactors = FALSE)
+
+# extract year and president for each speech
+sona$year <- str_sub(sona$filename, start = 1, end = 4)
+sona$president <- str_remove_all(str_extract(sona$filename, "[dA-Z].*\\."),
+                                 "\\.")
+
+# clean the sona dataset by adding the date and removing unnecessary text
+replace_reg <- '(http.*?(\\s|.$))|(www.*?(\\s|.$))|&amp;|&lt;|&gt;|\n'
+
+sona <-sona %>%
+  mutate(speech = str_replace_all(speech, replace_reg , ' ')
+         ,date = str_sub(speech, start=1, end=30)
+         ,date = str_replace_all(date, "February", "02")
+         ,date = str_replace_all(date, "June", "06")
+         ,date = str_replace_all(date, "Feb", "02")
+         ,date = str_replace_all(date, "May", "05")
+         ,date = str_replace_all(date, "Jun", "06")
+         ,date = str_replace_all(date, "Thursday, ","")
+         ,date = str_replace_all(date, ' ', '-')        
+         ,date = str_replace_all(date, "[A-z]",'')
+         ,date = str_replace_all(date, '-----', '')
+         ,date = str_replace_all(date, '----', '')
+         ,date = str_replace_all(date, '---', '')
+         ,date = str_replace_all(date, '--', '')
+  )
+
+sona$date[36] <- "09-02-2023"
+sona$year[36] <- "2023"
+
+sona$date <- dmy(sona$date)
+
 
 ```
 
-```{r wrangling}
+```{r wrangling, include = FALSE}
 #data wrangling 
 speech_tibble <- tibble(speech = speech_data)
 speech_tibble <- speech_tibble %>%
@@ -74,7 +146,8 @@ speech_tibble$Date<- dmy(speech_tibble$Date)
 speech_tibble <- speech_tibble %>%
   mutate(
     President = case_when(
-      Date < ymd("1999-06-14") ~ "Nelson Mandela",
+      Date<ymd("1994-05-24") ~ "F.W. De Klerk",
+      Date>=ymd("1994-05-24") & Date < ymd("1999-06-14") ~ "Nelson Mandela",
       Date >= ymd("1999-06-14") & Date < ymd("2008-09-24") ~ "Thabo Mbeki",
       Date >= ymd("2008-09-24") & Date <= ymd("2009-05-09") ~ "Kgalema Motlanthe",
       Date >= ymd("2009-05-09") & Date <= ymd("2018-02-14") ~ "Jacob Zuma",
@@ -97,6 +170,15 @@ speech_tokens <- speech_tokens %>%
 
 load("dsfi-lexicons.Rdata")
 
+#to be put in the appendices 
+set.seed(2023)
+bing_sample <- t(bing[sample(1:6786, 10),])
+kable(bing_sample, caption = "Sample of bing lexicon")
+
+set.seed(2023)
+nrc_sample <- t(nrc[sample(1:6786, 10),])
+kable(nrc_sample, caption = "Sample of nrc lexicon")
+
 ```
 
 ```{r bing sentiment,echo = FALSE}
@@ -105,27 +187,58 @@ speech_sentiment <- speech_tokens %>%
   rename(bing_sentiment = sentiment) %>%
   mutate(bing_sentiment = ifelse(is.na(bing_sentiment), 'neutral', bing_sentiment))
 
-#5 most positive words for each movie
+```
+
+```{r, echo = FALSE}
+
+#| label: fig-positive
+#| fig-cap: "Most positive words used by each President"
+
 speech_sentiment %>%
   filter(bing_sentiment == 'positive') %>%
   count(President, word) %>%
   group_by(President) %>% filter(rank(desc(n)) <= 5) %>%
-  ggplot(aes(reorder(word,n),n)) + geom_col() + facet_wrap(~President)+
-  coord_flip() + xlab('')
+  ggplot(aes(reorder(word,n),n)) + geom_col(aes(fill = word)) + facet_wrap(~President)+
+  coord_flip() + labs( y = 'Contribution to Sentiment')
+```
 
-#5 most negative words for each movie
+```{r, echo = FALSE}
+#| label : fig-negative_words
+#| fig-cap: "Most negative words used by each President"
+
 speech_sentiment %>%
   filter(bing_sentiment == 'negative') %>%
   count(President, word) %>%
   group_by(President) %>% filter(rank(desc(n)) <= 5) %>%
-  ggplot(aes(reorder(word,n),n)) + geom_col() + facet_wrap(~President) + coord_flip() + xlab('')
+  ggplot(aes(reorder(word,n),n)) + geom_col(aes(fill =word)) + facet_wrap(~President) + coord_flip() + labs( y = 'Contribution to Sentiment')
+
 
 ```
+
+```{r, echo = FALSE}
+#| label: fig-word_cloud
+#| fig-cap : "Word Cloud"
+
+speech_tokens%>%
+  anti_join(stop_words) %>%
+  count(word) %>%
+  with(wordcloud(word, n, max.words = 100, color = "random dark",
+                 ordered.colors = TRUE))
+```
+
+We can see from Figure @fig-positive that positive words such as 'reconciliation', 'freedom', 'progress', and 'improve' were commonly occurring in speeches made by Nelson Mandela. The word occurence of 'support' in the speeches seems to be increasing as we move towards the most recent president, Cyril Ramaphosa.
+
+Figure @fig-negative shows that most negative words used in each of the presidents. This may highlight some of the issues each president had experienced during their tenure. 'Crime' seems to be a word with one of the most commonly occurring in speeches made by Nelson Mandela, Thabo Mbeki, and Jacob Zuma. 'Poverty' is the most occuring negative word in Thabo Mbeki's speeches and also significant in Jacob Zuma's, and Cyril Ramaphosa's speeches. 
 
 ```{r nrc, echo = FALSE}
 speech_sentiment <- speech_sentiment %>% 
   left_join(nrc, by = "word") %>%
   rename(nrc_sentiment = sentiment) 
+```
+
+```{r overall, echo = FALSE }
+#| label: fig-overall
+#| fig-cap: "Proportion of sentiment words in speeches for each President"
 
 speech_sentiment%>%
   add_count(President,Date, name = "n_words") %>%
@@ -135,55 +248,30 @@ speech_sentiment%>%
   group_by(President, nrc_sentiment) %>%
   summarize(mean_prop = mean(prop)) %>% ungroup() %>%
   ggplot(aes(reorder(nrc_sentiment, mean_prop), mean_prop, fill = President)) + 
-  geom_bar(stat = "identity", position = 'dodge') + coord_flip() + xlab('')
+  geom_bar(stat = "identity", position = 'dodge') + coord_flip()+labs(y = "", x = "Sentiment Words")
 ```
 
-```{r LDA, echo=FALSE}
-speech_tdf <- speech_tokens%>%
-  group_by(Date,word) %>%
-  count() %>%  
-  ungroup() 
+Figure @fig-overall indicates the proportion of sentiment words, categorized using the nrc lexicon, for each of the presidents. Nelson Mandela's speeches have the highest proportion of positive sentiment while De Klerk's speeches have the the highest negative sentiment. Nelson Mandela's speeches have a relatively high proportion of words associated with anticipation, and fear, but also of joy and trust. 
 
-dtm_speech <- speech_tdf %>% 
-  cast_dtm(Date, word, n)
+```{r, echo = FALSE }
+#| label: fig-sentimentscore
+#| fig-cap: "Time series Plot of Average Sentiment using AFINN Lexicon Scoring System. Higher Values Represent more Positive Sentiment" 
 
-speech_lda <- LDA(dtm_speech, k = 36, control = list(seed = 2023))
+speech_sentiment <- speech_sentiment %>% 
+  left_join(afinn, by = "word") %>%
+  rename(afinn_value = value) 
 
-speech_topics <- tidy(speech_lda, matrix = 'beta')
-
-
-speech_topics %>%
-  group_by(topic) %>%
-  slice_max(n = 1, order_by = beta) %>% ungroup() %>%
-  arrange(topic, -beta) %>%
-  ggplot(aes(reorder(term, beta), beta, fill = factor(topic))) +
-  geom_col(show.legend = FALSE) +
-  facet_wrap(~ topic, scales = 'free') + coord_flip()
-
+speech_sentiment%>%select(Date, President, word, afinn_value)%>%na.omit%>% 
+  group_by(Date, President) %>%summarise(Mean_Score = mean(afinn_value)) %>%ungroup() %>% 
+  ggplot(aes(x = Date, y = Mean_Score, col = President))+ geom_line() +
+  labs(title = "Average Sentiment Score Time Series", x = "Date", y = " Average Sentiment Score") +
+  theme_minimal()
 ```
 
-```{r, echo =FALSE}
-speech_tdf_presidents <- speech_tokens%>%
-  group_by(President,word) %>%
-  count() %>%  
-  ungroup() 
+Figure @fig-sentimentscore shows a time series plot provides an overview of how sentiments have evolved over the years in the SONA speeches. There is a major spike in postive sentiment in Thabo Mbeke's address in May 2004 right after his re-election on 14th April 2004. This is followed by a lower average sentiment score for the rest of Mbeki's State of the Nation Addresses for the his second tenure. There was also a sharp decline in Jacob Zuma's SONA on 14th February 2003. Since Ramaphosa's time in office there has been an overall decline in the average sentiment score of the SONA each with the address in February 2022 having the lowest sentiment score since 1994. 
 
-dtm_speech_presidents <- speech_tdf_presidents %>% 
-  cast_dtm(President, word, n)
+\newpage
+### References
 
-speech_lda_presidents<- LDA(dtm_speech_presidents, k = 5, control = list(seed = 2023))
-
-speech_topics_presidents <- tidy(speech_lda_presidents, matrix = 'beta')
-
-
-speech_topics_presidents %>%
-  group_by(topic) %>%
-  slice_max(n = 20, order_by = beta) %>% ungroup() %>%
-  arrange(topic, -beta) %>%
-  ggplot(aes(reorder(term, beta), beta, fill = factor(topic))) +
-  geom_col(show.legend = FALSE) +
-  facet_wrap(~ topic, scales = 'free') + coord_flip()
-
-
-
-```
+::: {#refs}
+:::
