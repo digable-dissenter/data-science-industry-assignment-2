@@ -1,5 +1,5 @@
 ---
-title: "Data Science for Industry: Assignment 2"
+title: "A Descriptive Analysis of SONA speeches 1994-2023"
 author: "Kenneth Ssekimpi & Levy Banda"
 student_number: "SSKKEN001 & BNDLEV001"
 assignment: "Assignment 2"
@@ -20,9 +20,11 @@ knitr::opts_chunk$set(fig.pos = "H", out.extra = "")
 
 ```
 
+# Abstract
+
 # Introduction
 
-The State of the Nation Address (SONA) in South Africa serves as an opportunity for the president to address the nation and provide an overview of the government's accomplishments, plans, and priorities. This speech marks the opening of Parliament. It is an important political event and a key moment for the president to communicate the government's agenda to the South African Parliament (National Assembly and National Council of Provinces) [@sagov]. At the SONA, the president of South Africa is able to not only inform the nation of the economic and political policies rot be carried out, but also encourage South Africans, bringing hope and inspiring confidence in government. For example, after the South African National Rugby team won the Rugby World Cup in 2019, president Cryril Ramaphosa congratulated the team on their achievement and highlighted the pride this brought to the country during his SONA at the beginning of 2020 [@sagov].
+The State of the Nation Address (SONA) in South Africa serves as an opportunity for the president to address the nation and provide an overview of the government's accomplishments, plans, and priorities. This speech marks the opening of Parliament. It is an important political event and a key moment for the president to communicate the government's agenda to the South African Parliament (National Assembly and National Council of Provinces) [@sagov]. At the SONA, the President of South Africa is able to not only inform the nation of the economic and political policies to be carried out, but also encourage South Africans, bringing hope and inspiring confidence in government. For example, after the South African National Rugby team won the Rugby World Cup in 2019, President Cryril Ramaphosa congratulated the team on their achievement and highlighted the pride this brought to the country during his SONA at the beginning of 2020 [@sagov].
 
 Democratic governance can be seen at SONA's, as the president exposes the problems the country is currently facing and possibly provides an account on what is being done to solve them [@eshbaugh2010politics]. [@banguis2019role] highlighted that speeches made by Asian presidents revealed a lot of information about the state of affairs in the periods studied.
 
@@ -33,6 +35,44 @@ The implementation of data mining analysis techniques, such as topic modeling an
 ## Sentiment Analysis
 
 Studies such as [@budiharto2018prediction] have suggested frameworks into using sentiment analysis on posts on relevant topics on some social media websites to predict election results. Sentiment analysis can also be used to determine the mood of the nation by monitoring announcements made by leaders of the country, including presidential candidates [@vo2017multi]. [@bringula2023youtube] analyzed comments on Youtube to analyze opinions from political vloggers about two presidential canditates. Sentiment analysis can be used to summarize political issues and current affairs [@bollen2011modeling]. [@miranda2021exploring] studied State of the Nation Addresses of 13 Philippine presidents and discovered that the speeches had huge focus towards economic development, enhancement of public services, and addressing issues faced by the nation.
+
+### Latent Dirichlet Allocation
+
+Latent Dirichlet allocation (LDA) is a generative probabilistic model for collections of discrete data such as text corpora [@blei2003lda]. It is a topic modelling technique, which means that it can be used to identify the latent topics in a corpus of text.
+
+LDA has been used in a variety of ways in political science research. For example, it has been used to:
+
+-   Analyze the content of political speeches and texts to identify the key topics and themes \[\@miranda2021exploring\].
+
+-   Track the evolution of public opinion over time by analyzing social media posts and other forms of online discourse
+
+-   Identify patterns in political polarization and extremism
+
+-   Study the relationship between political discourse and political outcomes
+
+Here are some specific examples of how LDA has been used in political science research:
+
+-   \[\@budiharto2018prediction\] used LDA to analyze social media posts on election-related topics in Indonesia to predict the outcome of the 2019 Indonesian presidential election.
+
+-   \[\@vo2017multi\] used LDA to analyze the content of speeches made by South Korean politicians during the 2017 South Korean presidential election to identify the key topics and themes of the campaign.
+
+-   \[\@bringula2023youtube\] used LDA to analyze comments on YouTube videos from political vloggers to identify the opinions of voters on the 2022 Philippine presidential election.
+
+## **Potential Applications of LDA in Political Science**
+
+LDA has the potential to be used in a variety of other ways in political science research. For example, it could be used to:
+
+-   Analyze the content of political manifestos to identify the key policy priorities of different political parties
+
+-   Study the relationship between political discourse in different media outlets
+
+-   Identify cross-national patterns in political discourse
+
+-   Analyze the content of political advertising
+
+-   Study the relationship between political discourse and political violence
+
+LDA is a relatively new tool in political science research, but it has the potential to become an increasingly important tool for understanding political discourse and processes.
 
 # Data and Methodology
 
