@@ -38,41 +38,19 @@ Studies such as [@budiharto2018prediction] have suggested frameworks into using 
 
 ### Latent Dirichlet Allocation
 
-Latent Dirichlet allocation (LDA) is a generative probabilistic model for collections of discrete data such as text corpora [@blei2003lda]. It is a topic modelling technique, which means that it can be used to identify the latent topics in a corpus of text.
+Latent Dirichlet allocation (LDA) is a generative probabilistic model for collections of discrete data such as text corpora [@blei2003lda]. It is a topic modelling technique, which means that it can be used to identify thematic topics in large collections of text. While LDA is a relatively new tool in political science research, it has the potential to become an increasingly important tool for understanding political discourse and processes.
 
 LDA has been used in a variety of ways in political science research. For example, it has been used to:
 
--   Analyze the content of political speeches and texts to identify the key topics and themes \[\@miranda2021exploring\].
+-   Analyze the content of political speeches and texts to identify the key topics and themes [@miranda20211exploring].
 
--   Track the evolution of public opinion over time by analyzing social media posts and other forms of online discourse
+-   Identify the most topical issues relating to the COVID-19 pandemic that were being discussed by South Africans on Twitter, as well as the impacts of these issues on the people's reactions to and compliance with the South African government's efforts in managing the disease [@mutanga2022].
 
--   Identify patterns in political polarization and extremism
+-   Identify patterns in online discourse polarization and extremism, and the contributions and parameters thereof [@xu2020].
 
--   Study the relationship between political discourse and political outcomes
+-   Study the relationship between political discourse and political outcomes [@brookes2019].
 
-Here are some specific examples of how LDA has been used in political science research:
-
--   \[\@budiharto2018prediction\] used LDA to analyze social media posts on election-related topics in Indonesia to predict the outcome of the 2019 Indonesian presidential election.
-
--   \[\@vo2017multi\] used LDA to analyze the content of speeches made by South Korean politicians during the 2017 South Korean presidential election to identify the key topics and themes of the campaign.
-
--   \[\@bringula2023youtube\] used LDA to analyze comments on YouTube videos from political vloggers to identify the opinions of voters on the 2022 Philippine presidential election.
-
-## **Potential Applications of LDA in Political Science**
-
-LDA has the potential to be used in a variety of other ways in political science research. For example, it could be used to:
-
--   Analyze the content of political manifestos to identify the key policy priorities of different political parties
-
--   Study the relationship between political discourse in different media outlets
-
--   Identify cross-national patterns in political discourse
-
--   Analyze the content of political advertising
-
--   Study the relationship between political discourse and political violence
-
-LDA is a relatively new tool in political science research, but it has the potential to become an increasingly important tool for understanding political discourse and processes.
+According to [@xu2020], LDA has been used in a variety of other ways in political science research. For example, it been used to: analyze the content of political advertising and study the relationship between political discourse and political violence.
 
 # Data and Methodology
 
@@ -94,7 +72,7 @@ The aim of the sentiment analysis is to determine the emotional tonality express
 
 ```{r, include=FALSE}
 # Clear global environment
-rm(list=ls())
+# rm(list=ls())
 
 # Libraries we need
 libs <- c('dplyr', 'ggplot2', 'lubridate', 'purrr', 'reshape2', 'stringr', 'text2vec', 'tidyr', 'tidytext', 'topicmodels', 'tm', 'wordcloud', "kableExtra")
@@ -141,7 +119,7 @@ sona$president <- str_remove_all(str_extract(sona$filename, "[dA-Z].*\\."), "\\.
 
 # clean the sona dataset by adding the date and removing unnecessary text
 replace_reg <- '(http.*?(\\s|.$))|(www.*?(\\s|.$))|&amp;|&lt;|&gt;|\n'
-
+unnest_reg <- "[^A-Za-z_\\d#@']"
 sona <-sona %>%
   mutate(speech = str_replace_all(speech, replace_reg , ' ')
          ,date = str_sub(speech, start=1, end=30)
@@ -170,7 +148,7 @@ sona$date <- dmy(sona$date)
 ```{r preprocess}
 
 speech_tokens <- sona %>%
-  unnest_tokens(word, speech) %>%
+  unnest_tokens(word, speech, token = "regex", pattern = unnest_reg) %>%
   anti_join(stop_words)
   
 words_to_remove <- c("government", "South Africa", "national",
@@ -256,31 +234,9 @@ speech_sentiment%>%
   geom_bar(stat = "identity", position = 'dodge') + coord_flip() + xlab('')
 ```
 
-```{r LDA}
-speech_tdf <- speech_tokens%>%
-  group_by(date,word) %>%
-  count() %>%  
-  ungroup()
-
-dtm_speech <- speech_tdf %>% 
-  cast_dtm(date, word, n)
-
-speech_lda <- LDA(dtm_speech, k = 36, control = list(seed = 2023))
-
-speech_topics <- tidy(speech_lda, matrix = 'beta')
-
-speech_topics %>%
-  group_by(topic) %>%
-  slice_max(n = 1, order_by = beta) %>% ungroup() %>%
-  arrange(topic, -beta) %>%
-  ggplot(aes(reorder(term, beta), beta, fill = factor(topic))) +
-  geom_col(show.legend = FALSE) +
-  facet_wrap(~ topic, scales = 'free') + coord_flip()
-```
-
 Figure @fig-overall indicates the proportion of sentiment words, categorized using the nrc lexicon, for each of the presidents. Nelson Mandela's speeches have the highest proportion of positive sentiment while De Klerk's speeches have the the highest negative sentiment. Nelson Mandela's speeches have a relatively high proportion of words associated with anticipation, and fear, but also of joy and trust.
 
-```{r, echo = FALSE, warning=FALSE}
+```{r}
 #| label: fig-sentimentscore
 #| fig-cap: "Time series Plot of Average Sentiment using AFINN Lexicon Scoring System. Higher Values Represent more Positive Sentiment" 
 
@@ -300,6 +256,83 @@ speech_sentiment%>%
 ```
 
 Figure @fig-sentimentscore shows a time series plot provides an overview of how sentiments have evolved over the years in the SONA speeches. There is a major spike in postive sentiment in Thabo Mbeke's address in May 2004 right after his re-election on 14th April 2004. This is followed by a lower average sentiment score for the rest of Mbeki's State of the Nation Addresses for the his second tenure. There was also a sharp decline in Jacob Zuma's SONA on 14th February 2003. Since Ramaphosa's time in office there has been an overall decline in the average sentiment score of the SONA each with the address in February 2022 having the lowest sentiment score since 1994.
+
+```{r LDA}
+words_to_remove <- c("government", "South Africa", "national",
+                     "country", "south", "africa", "honourable", 
+                     "people", 'development', 'ensure', 'public', 'economic',
+                     'continue', 'regard', 'support', 'africans', 'african', 'programme', 'programmes', 'world', 'sector', 'million', 'billion', 'compatriots', 'including', 'chairperson', 'speaker', 'improve', 'address', 'president', 'deputy', 'services')
+
+tidy_speeches <- sona %>% 
+  unnest_tokens(word, speech, token = "words", to_lower = T) %>%
+  filter(!word %in% stop_words$word) %>%
+  filter(!word %in% words_to_remove) %>%
+  filter(!str_detect(word, "[0-9]"))
+
+speech_tdf <- tidy_speeches%>%
+  group_by(date,word) %>%
+  count() %>%  
+  ungroup()
+
+dtm_speech <- speech_tdf %>% 
+  cast_dtm(date, word, n)
+
+speech_lda <- LDA(dtm_speech, k = 8, control = list(seed = 2023))
+
+speech_topics <- tidy(speech_lda, matrix = 'beta')
+
+speech_topics %>%
+  distinct() %>%
+  group_by(topic) %>%
+  slice_max(n = 10, order_by = beta) %>% 
+  ungroup() %>%
+  arrange(topic, -beta) %>%
+  ggplot(aes(reorder(term, beta), beta, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = 'free') + coord_flip()
+```
+
+```{r}
+#| label: fig-topterms 
+#| #| fig-cap: "Time series Plot of Average Sentiment using AFINN Lexicon Scoring System. Higher Values Represent more Positive Sentiment"  
+top_terms <- speech_topics %>%   
+  group_by(topic) %>%   
+  top_n(15, beta) %>%   
+  ungroup() %>%   
+  arrange(topic, -beta)  
+
+top_terms %>%   
+  mutate(term = reorder(term, beta)) %>%   
+  ggplot(aes(term, beta, fill = factor(topic))) + geom_col(show.legend = FALSE) +   facet_wrap(~ topic, scales = "free") + coord_flip()
+```
+
+```{r}
+#| label: fig-topterms #| fig-cap: "Time series Plot of Average Sentiment using AFINN Lexicon Scoring System. Higher Values Represent more Positive Sentiment"  
+top_terms <- speech_topics %>%  
+  group_by(topic) %>%   
+  top_n(20, beta) %>%   
+  ungroup() %>%   
+  arrange(topic, -beta)  
+
+top_terms %>%   
+  mutate(term = reorder(term, beta)) %>%   
+  ggplot(aes(term, beta, fill = factor(topic))) + geom_col(show.legend = FALSE) +   facet_wrap(~ topic, scales = "free") + coord_flip()
+```
+
+```{r}
+sona$speechId <- 1:nrow(sona)
+
+speeches_gamma <- sona %>%  
+    left_join(tidy(speech_lda, matrix = "gamma") %>%  
+    mutate(speechId = as.numeric(document)) %>% 
+# some cleaning to make key variable (reviewId) usable 
+    select(-document) %>% 
+    spread(key = topic, value = gamma, sep = "_")) #  
+
+speeches_gamma %>%  
+  group_by(speechId) %>%  
+  summarize(ntopic1 = sum(topic_1 > 0.000001), ntopic2 = sum(topic_2 > 0.000001), ntopic3 = sum(topic_3 > 0.000001), ntopic4 = sum(topic_4 > 0.000001))
+```
 
 \newpage
 
