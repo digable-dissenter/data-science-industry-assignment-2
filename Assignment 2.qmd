@@ -40,17 +40,9 @@ Studies such as [@budiharto2018prediction] have suggested frameworks into using 
 
 Latent Dirichlet allocation (LDA) is a generative probabilistic model for collections of discrete data such as text corpora [@blei2003lda]. It is a topic modelling technique, which means that it can be used to identify thematic topics in large collections of text. While LDA is a relatively new tool in political science research, it has the potential to become an increasingly important tool for understanding political discourse and processes.
 
-LDA has been used in a variety of ways in political science research. For example, it has been used to:
+LDA has been used in a variety of ways in political science research. For example, it has been used to: analyze the content of political speeches and texts to identify the key topics and themes [@miranda20211exploring]; identify patterns in online discourse polarization and extremism, and the contributions and parameters thereof [@xu2020]; study the relationship between political discourse and political outcomes [@brookes2019]; and identify the most topical issues relating to the COVID-19 pandemic that were being discussed by South Africans on Twitter, as well as the impacts of these issues on the people's reactions to and compliance with the South African government's efforts in managing the disease [@mutanga2022].
 
--   Analyze the content of political speeches and texts to identify the key topics and themes [@miranda20211exploring].
-
--   Identify the most topical issues relating to the COVID-19 pandemic that were being discussed by South Africans on Twitter, as well as the impacts of these issues on the people's reactions to and compliance with the South African government's efforts in managing the disease [@mutanga2022].
-
--   Identify patterns in online discourse polarization and extremism, and the contributions and parameters thereof [@xu2020].
-
--   Study the relationship between political discourse and political outcomes [@brookes2019].
-
-According to [@xu2020], LDA has been used in a variety of other ways in political science research. For example, it been used to: analyze the content of political advertising and study the relationship between political discourse and political violence.
+Research into LDA techniques' usage in LDA research is still ongoing. According to [@xu2020], current research into LDA's utility to political science have included analyzing the content of political advertising and studying the relationship between political discourse and political violence.
 
 # Data and Methodology
 
@@ -66,6 +58,10 @@ To extract meaningful information from the text, tokenization is employed. It in
 
 The aim of the sentiment analysis is to determine the emotional tonality expressed in the State of the Nation Address. At the core of this sentiment analysis lies the sentiment lexicon---a dictionary that associates words or phrases with sentiment scores. In this paper, three different lexicons found in the 'tidyr' package were used: AFINN, bing and nrc. The AFINN lexicon assigns a score to each word in the topic with -5 being the most negative and 5 being the most postive score.The bing lexicon assigns each word in the tolkenized speeches as either negative or positive according to the lexicon association. The nrc lexicon assigns each word in the tolkenized speeches into categories of positive, negative, anger, anticipation, disgust, fear, joy, sadness, surprise, and trust.
 
+## Latent Dirichlet Allocation
+
+LDA is, by its nature, an iterative process.
+
 # Results
 
 ## Sentiment Analysis
@@ -75,7 +71,7 @@ The aim of the sentiment analysis is to determine the emotional tonality express
 # rm(list=ls())
 
 # Libraries we need
-libs <- c('dplyr', 'ggplot2', 'lubridate', 'purrr', 'reshape2', 'stringr', 'text2vec', 'tidyr', 'tidytext', 'topicmodels', 'tm', 'wordcloud', "kableExtra")
+libs <- c('dplyr', 'ggplot2', 'kableExtra', 'lubridate', 'purrr', 'reshape2', 'stringr', 'text2vec', 'tidyr', 'tidytext', 'topicdoc', 'topicmodels', 'tm', 'wordcloud', "kableExtra")
 
 # Install missing libraries
 installed_libs <- libs %in% rownames(installed.packages())
@@ -257,11 +253,14 @@ speech_sentiment%>%
 
 Figure @fig-sentimentscore shows a time series plot provides an overview of how sentiments have evolved over the years in the SONA speeches. There is a major spike in postive sentiment in Thabo Mbeke's address in May 2004 right after his re-election on 14th April 2004. This is followed by a lower average sentiment score for the rest of Mbeki's State of the Nation Addresses for the his second tenure. There was also a sharp decline in Jacob Zuma's SONA on 14th February 2003. Since Ramaphosa's time in office there has been an overall decline in the average sentiment score of the SONA each with the address in February 2022 having the lowest sentiment score since 1994.
 
+## Latent Dirichlet Allocation
+
 ```{r LDA}
 words_to_remove <- c("government", "South Africa", "national",
                      "country", "south", "africa", "honourable", 
-                     "people", 'development', 'ensure', 'public', 'economic',
-                     'continue', 'regard', 'support', 'africans', 'african', 'programme', 'programmes', 'world', 'sector', 'million', 'billion', 'compatriots', 'including', 'chairperson', 'speaker', 'improve', 'address', 'president', 'deputy', 'services')
+                     "people", 'ensure', 'public', 'continue', 'regard', 'development', 'support', 'africans', 'african', 'programme', 'programmes',  'compatriots', 'including',  'improve', 'address', 'president', 'deputy', 'services', 'chairperson', 'speaker', 'madame')
+
+# 'economic', 'public', 'sector', 'world', 'services', 'million', 'billion', 
 
 tidy_speeches <- sona %>% 
   unnest_tokens(word, speech, token = "words", to_lower = T) %>%
@@ -277,50 +276,186 @@ speech_tdf <- tidy_speeches%>%
 dtm_speech <- speech_tdf %>% 
   cast_dtm(date, word, n)
 
-speech_lda <- LDA(dtm_speech, k = 8, control = list(seed = 2023))
+speech_lda <- LDA(dtm_speech, k = 2, control = list(seed = 2023))
 
 speech_topics <- tidy(speech_lda, matrix = 'beta')
-
-speech_topics %>%
-  distinct() %>%
-  group_by(topic) %>%
-  slice_max(n = 10, order_by = beta) %>% 
-  ungroup() %>%
-  arrange(topic, -beta) %>%
-  ggplot(aes(reorder(term, beta), beta, fill = factor(topic))) +
-  geom_col(show.legend = FALSE) +
-  facet_wrap(~ topic, scales = 'free') + coord_flip()
 ```
 
 ```{r}
 #| label: fig-topterms 
 #| #| fig-cap: "Time series Plot of Average Sentiment using AFINN Lexicon Scoring System. Higher Values Represent more Positive Sentiment"  
-top_terms <- speech_topics %>%   
-  group_by(topic) %>%   
-  top_n(15, beta) %>%   
-  ungroup() %>%   
-  arrange(topic, -beta)  
+top_terms <- speech_topics %>%
+  group_by(topic) %>%
+  slice_max(beta, n = 10) %>% 
+  ungroup() %>%
+  arrange(topic, -beta)
 
-top_terms %>%   
-  mutate(term = reorder(term, beta)) %>%   
-  ggplot(aes(term, beta, fill = factor(topic))) + geom_col(show.legend = FALSE) +   facet_wrap(~ topic, scales = "free") + coord_flip()
+top_terms %>%
+  mutate(term = reorder_within(term, beta, topic)) %>%
+  ggplot(aes(beta, term, fill = factor(topic))) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free") +
+  scale_y_reordered()
 ```
 
 ```{r}
-#| label: fig-topterms #| fig-cap: "Time series Plot of Average Sentiment using AFINN Lexicon Scoring System. Higher Values Represent more Positive Sentiment"  
-top_terms <- speech_topics %>%  
+beta_wide <- speech_topics %>%
+  mutate(topic = paste0("topic", topic)) %>%
+  pivot_wider(names_from = topic, values_from = beta) %>% 
+  filter(topic1 > .001 | topic2 > .001) %>%
+  mutate(log_ratio = log2(topic2 / topic1))
+
+beta_wide
+```
+
+```{r}
+beta_wide %>%
+  group_by(direction = log_ratio > 0) %>%
+  top_n(10, abs(log_ratio)) %>%
+  ungroup() %>%
+  mutate(term = reorder(term, log_ratio)) %>%
+  ggplot(aes(term, log_ratio)) +
+  geom_col() +
+  labs(y = "Log2 ratio of beta in topic 2 / topic 1") +
+  coord_flip()
+```
+
+```{r}
+sona$speechId <- as.numeric(speech_lda@documents)
+
+speeches_gamma <- sona %>% 
+    left_join(tidy(speech_lda, matrix = "gamma") %>% 
+    mutate(speechId = as.numeric(document)) %>% # some cleaning to make key variable (reviewId) usable
+    select(-document) %>%
+    spread(key = topic, value = gamma, sep = "_"))
+```
+
+```{r}
+speeches_gamma %>% 
+  group_by(speechId) %>% 
+  summarize(ntopic1 = sum(topic_1 > 0.5))
+```
+
+```{r}
+speeches_gamma %>% 
+  group_by(speechId) %>% 
+  summarize(ntopic2 = sum(topic_2 > 0.5))
+```
+
+```{r}
+speeches_gamma %>% 
+  filter(speechId == "8824") %>% 
+  arrange(desc(topic_1)) %>% 
+  head(3)
+```
+
+```{r}
+# Evaluate a range of topic numbers from 10 to 36
+k_list <- seq(10, 50, by = 1)
+
+# Train LDA models for each topic number
+models <- lapply(k_list, function(k) LDA(dtm_speech, k = k))
+
+# Calculate the topic coherence score for each model
+coherence <- sapply(models, function(model) topic_coherence(model, dtm_speech))
+
+average_coherence_scores <- c()
+
+for (i in seq_along(coherence)) {
+  average_coherence_scores[i] <- mean(coherence[[i]])
+}
+
+# Plot the topic coherence scores
+ggplot(data.frame(k = k_list, coherence = average_coherence_scores), aes(x = k, y = coherence)) +
+  geom_point() +
+  geom_line(group = 1) +
+  ggtitle("Topic Coherence Scores") +
+  xlab("Number of Topics") +
+  ylab("Coherence Score")
+
+save(models, file = "Model_50.RData")
+```
+
+```{r}
+# Evaluate a range of topic numbers from 10 to 36
+k_list <- seq(2, 10, by = 1)
+
+# Train LDA models for each topic number
+models <- lapply(k_list, function(k) LDA(dtm_speech, k = k))
+
+# Calculate the topic coherence score for each model
+coherence <- sapply(models, function(model) topic_coherence(model, dtm_speech))
+
+average_coherence_scores <- c()
+
+for (i in seq_along(coherence)) {
+  average_coherence_scores[i] <- mean(coherence[[i]])
+}
+
+# Plot the topic coherence scores
+ggplot(data.frame(k = k_list, coherence = average_coherence_scores), aes(x = k, y = coherence)) +
+  geom_point() +
+  geom_line(group = 1) +
+  ggtitle("Topic Coherence Scores") +
+  xlab("Number of Topics") +
+  ylab("Coherence Score")
+```
+
+\
+
+```{r}
+speeches_gamma <- tidy(speech_lda, matrix = "gamma")
+speeches_gamma
+```
+
+```{r}
+tidy_speeches_2020 <- sona %>% 
+  filter(year == '1996') %>% 
+  unnest_tokens(word, speech, token = "words", to_lower = T) %>%
+  filter(!word %in% stop_words$word) %>%
+  filter(!word %in% words_to_remove) %>%
+  filter(!str_detect(word, "[0-9]"))
+
+speech_tdf_2020 <- tidy_speeches_2020 %>%
+  group_by(date,word) %>%
+  count() %>%  
+  ungroup()
+
+dtm_speech_2020 <- speech_tdf_2020 %>% 
+  cast_dtm(date, word, n)
+
+speech_lda_2020 <- LDA(dtm_speech_2020, k = 10, control = list(seed = 2023))
+
+speech_topics_2020 <- tidy(speech_lda_2020, matrix = 'beta')
+```
+
+```{r}
+top_terms
+```
+
+```{r}
+top_terms_2020 <- speech_topics_2020 %>%   
   group_by(topic) %>%   
-  top_n(20, beta) %>%   
+  top_n(10, beta) %>%   
   ungroup() %>%   
   arrange(topic, -beta)  
 
-top_terms %>%   
+top_terms_2020 %>%   
   mutate(term = reorder(term, beta)) %>%   
   ggplot(aes(term, beta, fill = factor(topic))) + geom_col(show.legend = FALSE) +   facet_wrap(~ topic, scales = "free") + coord_flip()
 ```
 
 ```{r}
 sona$speechId <- 1:nrow(sona)
+
+# Assuming you have a data frame containing your speeches, add the document-topic distribution to it
+speech_data_with_topics <- cbind(sona, speech_topics)
+
+# Calculate coherence scores for topics
+coherence_scores <- topic_coherence(speech_lda, dtm_speech)
+
+# Print coherence scores for each topic
+coherence_scores
 
 speeches_gamma <- sona %>%  
     left_join(tidy(speech_lda, matrix = "gamma") %>%  
