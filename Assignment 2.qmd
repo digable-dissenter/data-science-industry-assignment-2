@@ -22,6 +22,8 @@ knitr::opts_chunk$set(fig.pos = "H", out.extra = "")
 
 # Abstract
 
+**Keywords**: sentiment analysis, latent dirichlet allocation, topic modeling, sona
+
 # Introduction
 
 The State of the Nation Address (SONA) in South Africa serves as an opportunity for the president to address the nation and provide an overview of the government's accomplishments, plans, and priorities. This speech marks the opening of Parliament. It is an important political event and a key moment for the president to communicate the government's agenda to the South African Parliament (National Assembly and National Council of Provinces) [@sagov]. At the SONA, the President of South Africa is able to not only inform the nation of the economic and political policies to be carried out, but also encourage South Africans, bringing hope and inspiring confidence in government. For example, after the South African National Rugby team won the Rugby World Cup in 2019, President Cryril Ramaphosa congratulated the team on their achievement and highlighted the pride this brought to the country during his SONA at the beginning of 2020 [@sagov].
@@ -60,7 +62,21 @@ The aim of the sentiment analysis is to determine the emotional tonality express
 
 ## Latent Dirichlet Allocation
 
-LDA is, by its nature, an iterative process.
+LDA is, by its nature, an iterative process. First, determining the number of K's (topics) is an important first step in topic modelling. This leads to the organization and determination of our topics. The interpretation of topics largely depends on the actual context of the speeches and the choice of words. Reviewing each of the thiry six speeches would take tremendous effort; that said, the coherence and relevance of topics needs to be established in order to make meaning out of the model's results.
+
+In addition to the data preprocessing steps for sentiment analysis, particular care was taken to ensure that repetition across topics was minimized as much as possible given the number of topics which we decided to focus on (expanded on further below). Overlap between topics is normal. However, given the number of decided topics, the distinctiveness and interpretability of the topics was initially difficult to distinguish. This is especially evident in a large corpus of text like in our dataset. Thus less informative or repetitive words were removed.
+
+Deciding on the optimal number of topics was done by training the LDA model for each number of topics from two to ten and computing the average of the coherence scores for each topic in each model. Coherence scores are a measure of how well the topics in the model explain the data. It computes the pairwise similarity between the top words in each topic. Semantically coherent topics are indicated by higher coherence scores @blei2003. The averaged coherent scores for each value of K isshown in Figure @fig-ave-coherence. coherence Our dataset has speeches spanning nearly thirty years for six different presidents: thus, despite a lower value of K being associated with higher coherence, we could possibly lose a lot of nuance by choosing a lower value. Although, this could lead to overfitting.
+
+The three factors of interpretability, distinctiveness, and relevance were also taken into account in addition to the averaged coherence scores for each value of K, Each of the three factor will be expanded on below:
+
+-   Interpretability: A smaller number of topics is generally more interpretable, as it easier to understand a smaller number of more general topics. For a larger number of topics, the topics may be more specific and less distinct.
+
+-   Distinctiveness: A larger number of topics is generally more distinctive, as the topics are more specialized and less likely to overlap.
+
+-   Word relevance: In a large number of topics, each word will be associated with a narrower range of topics.
+
+Given the trade-off between these factors as well as the coherence score of each number of topics, eight was decided on as the optimal amount of topics. Relative interpretability and coherence was sacrificed for more distinctiveness and word relevance.
 
 # Results
 
@@ -71,7 +87,7 @@ LDA is, by its nature, an iterative process.
 # rm(list=ls())
 
 # Libraries we need
-libs <- c('dplyr', 'ggplot2', 'kableExtra', 'lubridate', 'purrr', 'reshape2', 'stringr', 'text2vec', 'tidyr', 'tidytext', 'topicdoc', 'topicmodels', 'tm', 'wordcloud', "kableExtra")
+libs <- c('dplyr', 'ggplot2', 'kableExtra', 'lubridate', 'purrr', 'reshape2', 'stringr', 'text2vec', 'tidyr', 'tidytext', 'topicdoc', 'topicmodels', 'tm', 'wordcloud')
 
 # Install missing libraries
 installed_libs <- libs %in% rownames(installed.packages())
@@ -213,9 +229,9 @@ speech_sentiment%>%
 
 ```
 
-We can see from Figure @fig-positive that positive words such as 'reconciliation', 'freedom', 'progress', and 'improve' were commonly occurring in speeches made by Nelson Mandela. The word occurence of 'support' in the speeches seems to be increasing as we move towards the most recent president, Cyril Ramaphosa.
+We can see from @fig-positive that positive words such as 'reconciliation', 'freedom', 'progress', and 'improve' were commonly occurring in speeches made by Nelson Mandela. The word occurence of 'support' in the speeches seems to be increasing as we move towards the most recent president, Cyril Ramaphosa.
 
-Figure @fig-nwords shows that most negative words used in each of the presidents. This may highlight some of the issues each president had experienced during their tenure. 'Crime' seems to be a word with one of the most commonly occurring in speeches made by Nelson Mandela, Thabo Mbeki, and Jacob Zuma. 'Poverty' is the most occuring negative word in Thabo Mbeki's speeches and also significant in Jacob Zuma's, and Cyril Ramaphosa's speeches.
+@fig-nwords shows that most negative words used in each of the presidents. This may highlight some of the issues each president had experienced during their tenure. 'Crime' seems to be a word with one of the most commonly occurring in speeches made by Nelson Mandela, Thabo Mbeki, and Jacob Zuma. 'Poverty' is the most occuring negative word in Thabo Mbeki's speeches and also significant in Jacob Zuma's, and Cyril Ramaphosa's speeches.
 
 ```{r overall}
 #| label: fig-overall
@@ -230,7 +246,7 @@ speech_sentiment%>%
   geom_bar(stat = "identity", position = 'dodge') + coord_flip() + xlab('')
 ```
 
-Figure @fig-overall indicates the proportion of sentiment words, categorized using the nrc lexicon, for each of the presidents. Nelson Mandela's speeches have the highest proportion of positive sentiment while De Klerk's speeches have the the highest negative sentiment. Nelson Mandela's speeches have a relatively high proportion of words associated with anticipation, and fear, but also of joy and trust.
+@fig-overall indicates the proportion of sentiment words, categorized using the nrc lexicon, for each of the presidents. Nelson Mandela's speeches have the highest proportion of positive sentiment while De Klerk's speeches have the the highest negative sentiment. Nelson Mandela's speeches have a relatively high proportion of words associated with anticipation, and fear, but also of joy and trust.
 
 ```{r}
 #| label: fig-sentimentscore
@@ -251,16 +267,14 @@ speech_sentiment%>%
   theme_minimal()
 ```
 
-Figure @fig-sentimentscore shows a time series plot provides an overview of how sentiments have evolved over the years in the SONA speeches. There is a major spike in postive sentiment in Thabo Mbeke's address in May 2004 right after his re-election on 14th April 2004. This is followed by a lower average sentiment score for the rest of Mbeki's State of the Nation Addresses for the his second tenure. There was also a sharp decline in Jacob Zuma's SONA on 14th February 2003. Since Ramaphosa's time in office there has been an overall decline in the average sentiment score of the SONA each with the address in February 2022 having the lowest sentiment score since 1994.
+@fig-sentimentscore shows a time series plot provides an overview of how sentiments have evolved over the years in the SONA speeches. There is a major spike in postive sentiment in Thabo Mbeke's address in May 2004 right after his re-election on 14th April 2004. This is followed by a lower average sentiment score for the rest of Mbeki's State of the Nation Addresses for the his second tenure. There was also a sharp decline in Jacob Zuma's SONA on 14th February 2003. Since Ramaphosa's time in office there has been an overall decline in the average sentiment score of the SONA each with the address in February 2022 having the lowest sentiment score since 1994.
 
 ## Latent Dirichlet Allocation
 
-```{r LDA}
+```{r LDA preprocessing}
 words_to_remove <- c("government", "South Africa", "national",
                      "country", "south", "africa", "honourable", 
-                     "people", 'ensure', 'public', 'continue', 'regard', 'development', 'support', 'africans', 'african', 'programme', 'programmes',  'compatriots', 'including',  'improve', 'address', 'president', 'deputy', 'services', 'chairperson', 'speaker', 'madame')
-
-# 'economic', 'public', 'sector', 'world', 'services', 'million', 'billion', 
+                     "people", 'ensure', 'public', 'continue', 'regard', 'development', 'support', 'africans', 'african', 'programme', 'programmes',  'compatriots', 'including',  'improve', 'address', 'president', 'deputy', 'services', 'chairperson', 'speaker', 'madame', 'sector', 'social', 'system', 'service', 'growth', 'million', 'past', 'time', 'process', 'world', 'progress', 'economy', 'economic', 'cape')
 
 tidy_speeches <- sona %>% 
   unnest_tokens(word, speech, token = "words", to_lower = T) %>%
@@ -275,15 +289,46 @@ speech_tdf <- tidy_speeches%>%
 
 dtm_speech <- speech_tdf %>% 
   cast_dtm(date, word, n)
+```
 
-speech_lda <- LDA(dtm_speech, k = 2, control = list(seed = 2023))
+```{r optimal LDA}
+#| label: fig-ave-coherence
+#| fig-cap: "Topic Coherence Scores (Averaged). Higer values indicates that number of topics are more meaningful (in comparison)" 
+
+# Evaluate a range of topic numbers from 2 to 10
+k_list <- seq(2, 10, by = 1)
+
+# Train LDA models for each topic number
+models <- lapply(k_list, function(k) LDA(dtm_speech, k = k, control = list(seed = 2023)))
+
+# Calculate the topic coherence score for each model
+coherence <- sapply(models, function(model) topic_coherence(model, dtm_speech))
+
+average_coherence_scores <- c()
+
+for (i in seq_along(coherence)) {
+  average_coherence_scores[i] <- mean(coherence[[i]])
+}
+
+# Plot the topic coherence scores
+ggplot(data.frame(k = k_list, coherence = average_coherence_scores), aes(x = k, y = coherence)) +
+  geom_point() +
+  geom_line(group = 1) +
+  ggtitle("Topic Coherence Scores") +
+  xlab("Number of Topics") +
+  ylab("Coherence Score")
+```
+
+```{r LDA_model}
+speech_lda <- LDA(dtm_speech, k = 8, control = list(seed = 2023))
 
 speech_topics <- tidy(speech_lda, matrix = 'beta')
 ```
 
-```{r}
-#| label: fig-topterms 
-#| #| fig-cap: "Time series Plot of Average Sentiment using AFINN Lexicon Scoring System. Higher Values Represent more Positive Sentiment"  
+```{r top_terms}
+#| label: fig-topterms-lda
+#| fig-cap: "Word-Topic Associations"  
+
 top_terms <- speech_topics %>%
   group_by(topic) %>%
   slice_max(beta, n = 10) %>% 
@@ -298,176 +343,117 @@ top_terms %>%
   scale_y_reordered()
 ```
 
-```{r}
-beta_wide <- speech_topics %>%
-  mutate(topic = paste0("topic", topic)) %>%
-  pivot_wider(names_from = topic, values_from = beta) %>% 
-  filter(topic1 > .001 | topic2 > .001) %>%
-  mutate(log_ratio = log2(topic2 / topic1))
+\@fig-topterms-lda shows the most frequent words for each of the eight topics organized in descending order of the words' per-topic-per-word probabilities. The topics can be interpreted as follows:
 
-beta_wide
-```
-
-```{r}
-beta_wide %>%
-  group_by(direction = log_ratio > 0) %>%
-  top_n(10, abs(log_ratio)) %>%
-  ungroup() %>%
-  mutate(term = reorder(term, log_ratio)) %>%
-  ggplot(aes(term, log_ratio)) +
-  geom_col() +
-  labs(y = "Log2 ratio of beta in topic 2 / topic 1") +
-  coord_flip()
-```
+1.  **National Aspirations and Democracy**: this category represents topics related to national hopes, democratic values, and critical issues impacting society and citizens' lives. It emphasizes building strong relations within the nation.
+2.  **Security, Jobs, and Local Development**: this category centers on security concerns, job creation, local development, and empowering women to ensure freedom and safety in local communities.
+3.  **Societal Implementation and Poverty Alleviation**: this category focuses on implementing societal changes, addressing poverty, and enhancing community capacity and financial well-being. It's about improving the quality of life.
+4.  **Infrastructure, Business, and Education**: this category highlights topics related to infrastructure development, business growth, education, and land management. It addresses planning for local development and education.
+5.  **Business Investment and Health**: this category emphasizes business investment, job creation, infrastructure development, and measure to ensure better health in societies.
+6.  **Society, Security, and Local Governance**: this category covers societal and security concerns, life matters local governance, and democratic land management. It's about maintaining critical societal aspects.
+7.  **Human Welfare, Peace, and Global Engagement**: this category delves into human welfare, poverty, international relations, and hopes for a peaceful society and engagement in global matters over a decade.
+8.  **Infrastructure Investment and Anti-Corruption**: this category highlights infrastructure investment, billion-dollar projects, energy, and water management, with an emphasis on reducing corruption and empowering women.
 
 ```{r}
 sona$speechId <- as.numeric(speech_lda@documents)
 
+speeches_gamma_init <- tidy(speech_lda, matrix = "gamma")
+
 speeches_gamma <- sona %>% 
-    left_join(tidy(speech_lda, matrix = "gamma") %>% 
-    mutate(speechId = as.numeric(document)) %>% # some cleaning to make key variable (reviewId) usable
+    left_join(speeches_gamma_init %>% 
+    mutate(speechId = as.numeric(document)) %>% 
     select(-document) %>%
     spread(key = topic, value = gamma, sep = "_"))
 ```
 
 ```{r}
-speeches_gamma %>% 
-  group_by(speechId) %>% 
-  summarize(ntopic1 = sum(topic_1 > 0.5))
+speeches_gamma_tbl <- speeches_gamma %>% 
+  group_by(date, president) %>% 
+  summarize('National Aspirations and Democracy' = sum(topic_1 > 0.5), 'Security, Jobs, and Local Development' = sum(topic_2 > 0.5), 'Societal Implementation and Poverty Alleviation' = sum(topic_3 > 0.5), 'Infrastructure, Business, and Education' = sum(topic_4 > 0.5), 'Business Investment and Health' = sum(topic_5 > 0.5), 'Society, Security, and Local Governance' = sum(topic_6 > 0.5), 'Human Welfare, Peace, and Global Engagement' = sum(topic_7 > 0.5), 'Infrastructure Investment and Anti-Corruption' = sum(topic_8 > 0.5))
+
+# For appendix
+kable(speeches_gamma_tbl, caption = "Presidential-Topic Association")
 ```
 
 ```{r}
-speeches_gamma %>% 
-  group_by(speechId) %>% 
-  summarize(ntopic2 = sum(topic_2 > 0.5))
+#| label: fig-prez-topic
+#| fig-cap: "President-Topic Association Boxplot"
+
+# Reshape the data to long format
+speeches_long <- speeches_gamma %>%
+  select(year, president, starts_with("topic")) %>%
+  pivot_longer(cols = starts_with("topic"), names_to = "topic", values_to = "gamma")
+
+# Create a boxplot of each president's influence on each topic
+ggplot(speeches_long, aes(x = president, y = gamma, fill = topic)) +
+  geom_boxplot() +
+  labs(x = "President", y = "Topic Influence (Gamma Score)", fill = "Topic") +
+  scale_fill_discrete(name = "Topic") +
+  theme_minimal()
 ```
+
+@fig-prez-topic shows the per-document-per-topic probability by gamma. It shows how well the LDA model distinguishes between the different topics for each president. President de Klerk and President Motlanthe's distributions are noteworthy here: each is only represented by one speech, hence not much relevance is established to the topics. The dataset is unbalanced in this regard. Of course, de Klerk was the outgoing president at the turn of democracy in 1994, and Motlanthe served as the interim president when President Mbeki was recalled by his own party, the African National Congress (ANC), for the remainder of Mbeki's term.
+
+As years pass, it is natural to expect that certain topics are associated with certain presidents. President Mandela's term heralded the birth of modern South Africa. His speeches have notable associations with nation building and democracy (topic 1) and establishing a new society (topic 6).
+
+President Mbeki's, in turn, spoke to addressing poverty, increasing economic prosperity (Broad-Based Black Economic Empowerment legislation came into effect in 2003), peace (the 2001 terrorist attack on American soil spawned several wars in the Middle East region), and growing global influence.
+
+President Zuma focussed quite heavily on infrastructure and growth. Indeed, the 2010 FIFA World Cup occurred under his presidency.
+
+Lastly, President Ramaphosa has an association with continued infrastructure development, business investment (he is noted as an adept businessman), and health. Less than a year after his presidential term began, the COVID-19 virus caused a global pandemic. Anti-corruption rhetoric is also noted here: he succeeded President Zuma, who resigned in 2018 amidst his misuse of state expenditure for personal gain. His term is also associated with advocating for peace amidst the gender-based violence protests that occurred towards the end of 2019.
 
 ```{r}
-speeches_gamma %>% 
-  filter(speechId == "8824") %>% 
-  arrange(desc(topic_1)) %>% 
-  head(3)
+#| label: fig-topic-time
+#| fig-cap: "Topic Relevance Over Time"
+#| fig-width: 10
+#| fig-height: 10
+
+# Reshape the data to long format for plotting
+speeches_long <- speeches_gamma %>%
+  gather(topic, proportion, starts_with("topic")) %>%
+  mutate(topic = sub("topic_", "", topic) %>% as.numeric()) %>%
+  filter(proportion > 0.5) %>%
+  arrange(year, president)
+
+all_years <- all_years <- unique(speeches_long$year)
+
+speeches_long['topic'][speeches_long['topic'] == 1] <- '1: National Aspirations & Democracy'
+speeches_long['topic'][speeches_long['topic'] == 2] <- '2: Security, Jobs, & Local Development'
+speeches_long['topic'][speeches_long['topic'] == 3] <- '3: Societal Implementation & Poverty Alleviation'
+speeches_long['topic'][speeches_long['topic'] == 4] <- '4: Infrastructure, Business, and Education'
+speeches_long['topic'][speeches_long['topic'] == 5] <- '5: Business Investment & Health'
+speeches_long['topic'][speeches_long['topic'] == 6] <- '6: Society, Security, & Local Governance'
+speeches_long['topic'][speeches_long['topic'] == 7] <- '7: Human Welfare, Peace, & Global Engagement'
+speeches_long['topic'][speeches_long['topic'] == 8] <- '8: Infrastructure Investment & Anti-Corruption'
+
+# Create a stacked bar plot
+ggplot(speeches_long, aes(x = factor(year, levels = all_years), fill = factor(topic))) +
+  geom_bar() +
+  labs(x = "Year", y = "Number of Speeches", fill = "Topic") +
+  scale_fill_discrete(name = "Topic") +
+  theme_minimal() +
+  scale_x_discrete(expand = c(0, 0))
 ```
 
-```{r}
-# Evaluate a range of topic numbers from 10 to 36
-k_list <- seq(10, 50, by = 1)
+@fig-topic-time shows the relevance of each topic over time. This graph can be interpreted along with @fig-prez-topic, seeing as, respectively, each president term-of-office was as follows:
 
-# Train LDA models for each topic number
-models <- lapply(k_list, function(k) LDA(dtm_speech, k = k))
+-   de Klerk: 1989 - 1994
 
-# Calculate the topic coherence score for each model
-coherence <- sapply(models, function(model) topic_coherence(model, dtm_speech))
+-   Mandela: 1994 - 1999
 
-average_coherence_scores <- c()
+-   Mbeki: 1999 - 2008
 
-for (i in seq_along(coherence)) {
-  average_coherence_scores[i] <- mean(coherence[[i]])
-}
+-   Motlanthe - 2008-2009
 
-# Plot the topic coherence scores
-ggplot(data.frame(k = k_list, coherence = average_coherence_scores), aes(x = k, y = coherence)) +
-  geom_point() +
-  geom_line(group = 1) +
-  ggtitle("Topic Coherence Scores") +
-  xlab("Number of Topics") +
-  ylab("Coherence Score")
+-   Zuma: 2009 - 2018
 
-save(models, file = "Model_50.RData")
-```
+-   Ramaphosa: 2018 - current
 
-```{r}
-# Evaluate a range of topic numbers from 10 to 36
-k_list <- seq(2, 10, by = 1)
+Each presidential administration faces unique challenges that distinguishes itself from the other; and each presidential term is five years, which coincides with the election cycle. Thus the theme-presidential association applies here, too.
 
-# Train LDA models for each topic number
-models <- lapply(k_list, function(k) LDA(dtm_speech, k = k))
+# Discussion
 
-# Calculate the topic coherence score for each model
-coherence <- sapply(models, function(model) topic_coherence(model, dtm_speech))
-
-average_coherence_scores <- c()
-
-for (i in seq_along(coherence)) {
-  average_coherence_scores[i] <- mean(coherence[[i]])
-}
-
-# Plot the topic coherence scores
-ggplot(data.frame(k = k_list, coherence = average_coherence_scores), aes(x = k, y = coherence)) +
-  geom_point() +
-  geom_line(group = 1) +
-  ggtitle("Topic Coherence Scores") +
-  xlab("Number of Topics") +
-  ylab("Coherence Score")
-```
-
-\
-
-```{r}
-speeches_gamma <- tidy(speech_lda, matrix = "gamma")
-speeches_gamma
-```
-
-```{r}
-tidy_speeches_2020 <- sona %>% 
-  filter(year == '1996') %>% 
-  unnest_tokens(word, speech, token = "words", to_lower = T) %>%
-  filter(!word %in% stop_words$word) %>%
-  filter(!word %in% words_to_remove) %>%
-  filter(!str_detect(word, "[0-9]"))
-
-speech_tdf_2020 <- tidy_speeches_2020 %>%
-  group_by(date,word) %>%
-  count() %>%  
-  ungroup()
-
-dtm_speech_2020 <- speech_tdf_2020 %>% 
-  cast_dtm(date, word, n)
-
-speech_lda_2020 <- LDA(dtm_speech_2020, k = 10, control = list(seed = 2023))
-
-speech_topics_2020 <- tidy(speech_lda_2020, matrix = 'beta')
-```
-
-```{r}
-top_terms
-```
-
-```{r}
-top_terms_2020 <- speech_topics_2020 %>%   
-  group_by(topic) %>%   
-  top_n(10, beta) %>%   
-  ungroup() %>%   
-  arrange(topic, -beta)  
-
-top_terms_2020 %>%   
-  mutate(term = reorder(term, beta)) %>%   
-  ggplot(aes(term, beta, fill = factor(topic))) + geom_col(show.legend = FALSE) +   facet_wrap(~ topic, scales = "free") + coord_flip()
-```
-
-```{r}
-sona$speechId <- 1:nrow(sona)
-
-# Assuming you have a data frame containing your speeches, add the document-topic distribution to it
-speech_data_with_topics <- cbind(sona, speech_topics)
-
-# Calculate coherence scores for topics
-coherence_scores <- topic_coherence(speech_lda, dtm_speech)
-
-# Print coherence scores for each topic
-coherence_scores
-
-speeches_gamma <- sona %>%  
-    left_join(tidy(speech_lda, matrix = "gamma") %>%  
-    mutate(speechId = as.numeric(document)) %>% 
-# some cleaning to make key variable (reviewId) usable 
-    select(-document) %>% 
-    spread(key = topic, value = gamma, sep = "_")) #  
-
-speeches_gamma %>%  
-  group_by(speechId) %>%  
-  summarize(ntopic1 = sum(topic_1 > 0.000001), ntopic2 = sum(topic_2 > 0.000001), ntopic3 = sum(topic_3 > 0.000001), ntopic4 = sum(topic_4 > 0.000001))
-```
+# Conclusion
 
 \newpage
 
