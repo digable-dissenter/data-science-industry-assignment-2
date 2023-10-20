@@ -70,11 +70,11 @@ Deciding on the optimal number of topics was done by training the LDA model for 
 
 The three factors of interpretability, distinctiveness, and relevance were also taken into account in addition to the averaged coherence scores for each value of K, Each of the three factor will be expanded on below:
 
--   Interpretability: A smaller number of topics is generally more interpretable, as it easier to understand a smaller number of more general topics. For a larger number of topics, the topics may be more specific and less distinct.
+-   ***Interpretability***: A smaller number of topics is generally more interpretable, as it easier to understand a smaller number of more general topics. For a larger number of topics, the topics may be more specific and less distinct.
 
--   Distinctiveness: A larger number of topics is generally more distinctive, as the topics are more specialized and less likely to overlap.
+-   ***Distinctiveness***: A larger number of topics is generally more distinctive, as the topics are more specialized and less likely to overlap.
 
--   Word relevance: In a large number of topics, each word will be associated with a narrower range of topics.
+-   ***Word relevance***: In a large number of topics, each word will be associated with a narrower range of topics.
 
 Given the trade-off between these factors as well as the coherence score of each number of topics, eight was decided on as the optimal amount of topics. Relative interpretability and coherence was sacrificed for more distinctiveness and word relevance.
 
@@ -392,7 +392,7 @@ ggplot(speeches_long, aes(x = president, y = gamma, fill = topic)) +
   theme_minimal()
 ```
 
-@fig-prez-topic shows the per-document-per-topic probability by gamma. It shows how well the LDA model distinguishes between the different topics for each president. President de Klerk and President Motlanthe's distributions are noteworthy here: each is only represented by one speech, hence not much relevance is established to the topics. The dataset is unbalanced in this regard. Of course, de Klerk was the outgoing president at the turn of democracy in 1994, and Motlanthe served as the interim president when President Mbeki was recalled by his own party, the African National Congress (ANC), for the remainder of Mbeki's term.
+@fig-prez-topic shows the *per-document-per-topic* probability by gamma. It shows how well the LDA model distinguishes between the different topics for each president. President de Klerk and President Motlanthe's distributions are noteworthy here: each is only represented by one speech, hence not much relevance is established to the topics. The dataset is unbalanced in this regard. Of course, de Klerk was the outgoing president at the turn of democracy in 1994, and Motlanthe served as the interim president when President Mbeki was recalled by his own party, the African National Congress (ANC), for the remainder of Mbeki's term.
 
 As years pass, it is natural to expect that certain topics are associated with certain presidents. President Mandela's term heralded the birth of modern South Africa. His speeches have notable associations with nation building and democracy (topic 1) and establishing a new society (topic 6).
 
