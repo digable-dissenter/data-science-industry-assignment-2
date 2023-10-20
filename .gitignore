@@ -1,0 +1,15 @@
+# dependencies
+/data
+/.quarto
+/.Rproj.user
+
+.gitignore
+.Rproj.user
+.Rhistory
+*.RData
+*.Ruserdata
+*.zip
+*.txt
+*.docx
+*.pdf
+*.png
