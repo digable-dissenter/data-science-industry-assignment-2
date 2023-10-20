@@ -6,8 +6,8 @@
 .gitignore
 .Rproj.user
 .Rhistory
-.RData
-.Ruserdata
+*.RData
+*.Ruserdata
 *.zip
 *.txt
 *.docx
