@@ -6,88 +6,37 @@ assignment: "Assignment 2"
 editor: visual
 embed-resources: true
 bibliography: Reference_list.bib
-format: html
+format: 
+  html:
+    toc: true
 execute: 
   warning: false
   echo: false
+  cache: true
+metadata:
+  link-citations: true
+  date-format: long
+  lang: en
 ---
 
-```{r setup, include=FALSE}
+```{r}
+#| label: setup
+#| include: false
 
 knitr::opts_knit$set(root.dir = "C:/Users/User/OneDrive/Documents/School/2023/Masters/STA5073Z/Assignments/Assignment 2/ds4l-assignment-2")
 
 knitr::opts_chunk$set(fig.pos = "H", out.extra = "")
-
 ```
 
-# Abstract
+```{r}
+#| label: packages
+#| include: false
 
-**Keywords**: sentiment analysis, latent dirichlet allocation, topic modeling, sona
-
-# Introduction
-
-The State of the Nation Address (SONA) in South Africa serves as an opportunity for the president to address the nation and provide an overview of the government's accomplishments, plans, and priorities. This speech marks the opening of Parliament. It is an important political event and a key moment for the president to communicate the government's agenda to the South African Parliament (National Assembly and National Council of Provinces) [@sagov]. At the SONA, the President of South Africa is able to not only inform the nation of the economic and political policies to be carried out, but also encourage South Africans, bringing hope and inspiring confidence in government. For example, after the South African National Rugby team won the Rugby World Cup in 2019, President Cryril Ramaphosa congratulated the team on their achievement and highlighted the pride this brought to the country during his SONA at the beginning of 2020 [@sagov].
-
-Democratic governance can be seen at SONA's, as the president exposes the problems the country is currently facing and possibly provides an account on what is being done to solve them [@eshbaugh2010politics]. [@banguis2019role] highlighted that speeches made by Asian presidents revealed a lot of information about the state of affairs in the periods studied.
-
-The implementation of data mining analysis techniques, such as topic modeling and sentiment analysis, allows for a more profound examination and comprehension of past State of the Nation Addresses (SONAs). Data mining offers the opportunity to gain insights into the challenges faced by previous leaders and to evaluate the ongoing relevance of these issues in contemporary contexts [@miranda2021exploring]
-
-# Literature Review
-
-## Sentiment Analysis
-
-Studies such as [@budiharto2018prediction] have suggested frameworks into using sentiment analysis on posts on relevant topics on some social media websites to predict election results. Sentiment analysis can also be used to determine the mood of the nation by monitoring announcements made by leaders of the country, including presidential candidates [@vo2017multi]. [@bringula2023youtube] analyzed comments on Youtube to analyze opinions from political vloggers about two presidential canditates. Sentiment analysis can be used to summarize political issues and current affairs [@bollen2011modeling]. [@miranda2021exploring] studied State of the Nation Addresses of 13 Philippine presidents and discovered that the speeches had huge focus towards economic development, enhancement of public services, and addressing issues faced by the nation.
-
-### Latent Dirichlet Allocation
-
-Latent Dirichlet allocation (LDA) is a generative probabilistic model for collections of discrete data such as text corpora [@blei2003lda]. It is a topic modelling technique, which means that it can be used to identify thematic topics in large collections of text. While LDA is a relatively new tool in political science research, it has the potential to become an increasingly important tool for understanding political discourse and processes.
-
-LDA has been used in a variety of ways in political science research. For example, it has been used to: analyze the content of political speeches and texts to identify the key topics and themes [@miranda20211exploring]; identify patterns in online discourse polarization and extremism, and the contributions and parameters thereof [@xu2020]; study the relationship between political discourse and political outcomes [@brookes2019]; and identify the most topical issues relating to the COVID-19 pandemic that were being discussed by South Africans on Twitter, as well as the impacts of these issues on the people's reactions to and compliance with the South African government's efforts in managing the disease [@mutanga2022].
-
-Research into LDA techniques' usage in LDA research is still ongoing. According to [@xu2020], current research into LDA's utility to political science have included analyzing the content of political advertising and studying the relationship between political discourse and political violence.
-
-# Data and Methodology
-
-## Data Preprocessing
-
-The full text of State of the Nation Address (SONA) speeches, from 1994 to 2023, was collected from the official South African Governement website. Data preprocessing is an essential phase in text analysis, aimed at transforming the raw text data into a structured format suitable for in-depth analysis of the speeches. For this we chose the 'tidytext' package found in R programming language which provided a versatile platform for text analysis
-
-The initial step in data preprocessing was to identify the date of the speech and the president who addressed the nation. Following this was the removal of special characters, digits and punctuation marks. Elements, such as symbols, commas, periods, and question marks, can introduce noise into the text and hinder accurate analysis. Numerical values and digits hold limited relevance and may disrupt the analysis of textual content. Their exclusion simplifies the text, making it more text-centric.
-
-To extract meaningful information from the text, tokenization is employed. It involves breaking down the continuous string of text into individual units, known as tokens, usually words or phrases. Tokenization provides the foundation for understanding the text's structure and content, making it more amenable to analysis. All the characters in the text are converted to lower case. This ensures that the analysis is not case sensitive. Stop words, commonly occurring words that hold not much meaning, are removed: shifting the focus to content-carrying words, enhancing the identification of significant themes and patterns in the SONA speeches.
-
-## Sentiment Analysis
-
-The aim of the sentiment analysis is to determine the emotional tonality expressed in the State of the Nation Address. At the core of this sentiment analysis lies the sentiment lexicon---a dictionary that associates words or phrases with sentiment scores. In this paper, three different lexicons found in the 'tidyr' package were used: AFINN, bing and nrc. The AFINN lexicon assigns a score to each word in the topic with -5 being the most negative and 5 being the most postive score.The bing lexicon assigns each word in the tolkenized speeches as either negative or positive according to the lexicon association. The nrc lexicon assigns each word in the tolkenized speeches into categories of positive, negative, anger, anticipation, disgust, fear, joy, sadness, surprise, and trust.
-
-## Latent Dirichlet Allocation
-
-LDA is, by its nature, an iterative process. First, determining the number of K's (topics) is an important first step in topic modelling. This leads to the organization and determination of our topics. The interpretation of topics largely depends on the actual context of the speeches and the choice of words. Reviewing each of the thiry six speeches would take tremendous effort; that said, the coherence and relevance of topics needs to be established in order to make meaning out of the model's results.
-
-In addition to the data preprocessing steps for sentiment analysis, particular care was taken to ensure that repetition across topics was minimized as much as possible given the number of topics which we decided to focus on (expanded on further below). Overlap between topics is normal. However, given the number of decided topics, the distinctiveness and interpretability of the topics was initially difficult to distinguish. This is especially evident in a large corpus of text like in our dataset. Thus less informative or repetitive words were removed.
-
-Deciding on the optimal number of topics was done by training the LDA model for each number of topics from two to ten and computing the average of the coherence scores for each topic in each model. Coherence scores are a measure of how well the topics in the model explain the data. It computes the pairwise similarity between the top words in each topic. Semantically coherent topics are indicated by higher coherence scores @blei2003. The averaged coherent scores for each value of K isshown in Figure @fig-ave-coherence. coherence Our dataset has speeches spanning nearly thirty years for six different presidents: thus, despite a lower value of K being associated with higher coherence, we could possibly lose a lot of nuance by choosing a lower value. Although, this could lead to overfitting.
-
-The three factors of interpretability, distinctiveness, and relevance were also taken into account in addition to the averaged coherence scores for each value of K, Each of the three factor will be expanded on below:
-
--   ***Interpretability***: A smaller number of topics is generally more interpretable, as it easier to understand a smaller number of more general topics. For a larger number of topics, the topics may be more specific and less distinct.
-
--   ***Distinctiveness***: A larger number of topics is generally more distinctive, as the topics are more specialized and less likely to overlap.
-
--   ***Word relevance***: In a large number of topics, each word will be associated with a narrower range of topics.
-
-Given the trade-off between these factors as well as the coherence score of each number of topics, eight was decided on as the optimal amount of topics. Relative interpretability and coherence was sacrificed for more distinctiveness and word relevance.
-
-# Results
-
-## Sentiment Analysis
-
-```{r, include=FALSE}
 # Clear global environment
 # rm(list=ls())
 
 # Libraries we need
-libs <- c('dplyr', 'ggplot2', 'kableExtra', 'lubridate', 'purrr', 'reshape2', 'stringr', 'text2vec', 'tidyr', 'tidytext', 'topicdoc', 'topicmodels', 'tm', 'wordcloud')
+libs <- c('dplyr', 'ggplot2', 'kableExtra', 'lubridate', 'magick', 'purrr', 'reshape2', 'stringr', 'text2vec', 'tidyr', 'tidytext', 'topicdoc', 'topicmodels', 'tm', 'wordcloud')
 
 # Install missing libraries
 installed_libs <- libs %in% rownames(installed.packages())
@@ -99,11 +48,141 @@ if (any(installed_libs == FALSE)) {
 invisible(lapply(libs, library, character.only = TRUE))
 ```
 
-```{r, include= FALSE}
+```{r}
+#| label: unzip
+#| inclde: false
+
 unzip("sona-addresses-1994-2023.zip", exdir = "data")
 ```
 
-```{r read_wrangle}
+# Abstract
+
+------------------------------------------------------------------------
+
+The State of the Nation Address (SONA) in South Africa is a pivotal annual event where the president outlines the government's achievements, plans, and priorities, serving as a vital platform for accountability and transparency. Researchers analyze SONAs using data mining techniques to gain insights into past speeches, assess government sentiment, identify key topics, and track the evolution of government priorities, contributing to a deeper understanding of this critical political discourse.
+
+Sentiment analysis and Latent Dirichlet Allocation (LDA) are two data mining techniques that can be used to study political discourse. Sentiment analysis can be used to identify the emotional tone of text, while LDA can be used to identify thematic topics in large collections of text.
+
+The research involved collecting and processing SONA speeches from 1994 to 2023, utilizing data preprocessing to make the text suitable for analysis. The analysis included sentiment analysis using various lexicons, LDA for topic modeling, and determining the optimal number of topics through
+coherence scores, ultimately selecting seven topics for more distinct and relevant results.
+
+The analysis involves examining the frequency of positive and negative words in speeches by different South African presidents, highlighting how these trends change over time. It also evaluates the performance of an LDA model in distinguishing topics discussed in the speeches and how these topics are associated with different presidents, with specific attention to the LDA model's metrics, topic relevance over time, and their connection to presidential terms.
+
+The lessons learned from this study can inform future research on natural language processing's use in political science.
+
+------------------------------------------------------------------------
+
+**Keywords**: sentiment analysis, latent dirichlet allocation, topic modeling, sona
+
+# Introduction
+
+The State of the Nation Address (SONA) in South Africa serves as an opportunity for the president to address the nation and provide an overview of the government's accomplishments, plans, and priorities. This speech marks the opening of Parliament. The SONA is an important political event in the South African political calendar, and plays an important role in accountability and transparency. It is a key moment for the president to communicate the government's agenda to the South African Parliament (National Assembly and National Council of Provinces) [@sagov].
+
+The SONA was first held in 1990, a once-off event then, but has since the inauguration of President Nelson Mandela in 1994 been an annual event. Then outgoing President Frederik Willem de Klerk held a SONA before the election in 1994, setting a precedent for the event to be held twice in election years - once before and once after [@sagov].
+
+At the SONA, the President of South Africa is able to not only inform the nation of the economic and political policies, social development, and security, but also encourage South Africans, bringing hope and inspiring confidence in government. For example, after the South African National Rugby team won the Rugby World Cup in 2019, President Cryril Ramaphosa congratulated the team on their achievement and highlighted the pride this brought to the country during his SONA at the beginning of 2020 [@sagov].
+
+Democratic governance can be seen at SONA's, as the president exposes the problems the country is currently facing and possibly provides an account on what is being done to solve them [@eshbaugh2010politics]. The government's response to the most pressing issues varied over time, but the SONA remains an important mechanism for public engagement and debate.
+
+The SONA - and other similar speeches made by presidents elsewhere - is analyzedd in a variety of ways by academics, journalists, and civil society organizations. An example being [@banguis2019role], who highlighted that speeches made by Asian presidents revealed a lot of information about the state of affairs in the periods studied. This analysis can be used to inform policy and decision-making, and to hold government accountable for its promises.
+
+The implementation of data mining analysis techniques, such as topic modeling and sentiment analysis, allows for a more profound examination and comprehension of past SONAs. Data mining offers the opportunity to gain insights into the challenges faced by previous leaders and to evaluate the ongoing relevance of these issues in contemporary contexts [@miranda2021exploring].
+
+In this paper, we use data mining techniques to analyze the content of past SONAs. We examine on the sentiment of the SONAs in order to assess the government's tone and outlook. We also focus on identifying the key topics that have been addressed in the past, and on tracking how the government's priorities have evolved over time.
+
+Our research thus contributes to the existing literature on the SONA by providing a systematic analysis of the content of past speeches.
+
+# Literature Review
+
+Sentiment analysis and Latent Dirichlet Allocation (LDA) are two data mining techniques that can be used to study political discourse. Sentiment analysis can be used to identify the emotional tone of text, while LDA can be used to identify thematic topics in large collections of text.
+
+## Sentiment Analysis
+
+Sentiment analysis is a natural language processing (NLP) technique that aims to identify the sentiment of a piece of text [@chong2014]. Sentiment is defined as the emotional tone of a text, and it can be positive, negative, or neutral [@mohammad2016]. Sentiment analysis is used in a variety of applications, including social media monitoring, customer feedback analysis, and product development [@olivera2018].
+
+Sentiment analysis can be performed using a variety of machine learning techniques [@chakraborty2018]. One common approach is to use a supervised learning technique, such as support vector machines (SVG) or logistic regression. Supervised learning techniques require a labeled dataset of text and sentiment labels. The model is trained on this dataset, and then used to predict the sentiment of new pieces of text.
+
+Another common approach to sentiment analysis is to use an unsupervised learning technique. Unsupervised learning techniques do not require a labeled dataset. Instead, they learn the sentiment of text by identifying patterns in the data.
+
+Sentiment analysis is a rapidly growing field of research, and new techniques are being developed all the time. [@taj2021] provided a comprehensive overview of the evolving methodologies of sentiment analysis, highlighting the key strengths and weaknesses of each approach. The approaches were defined as follows:
+
+-   ***Lexicon-based sentiment analysis***: the oldest and most widely used approach to sentiment analysis. It relies on a dictionary of words and phrases, each of which is associated with a sentiment score. The sentiment score of a text is calculated by averaging the sentiment scores of the individual words and phrases it contains. It is simple to implement, efficient, and language independent, but it can be inaccurate, especially for complex or nuanced language [@taj2021].
+
+-   ***Machine learning-based sentiment analysis***: a newer approach to sentiment analysis that uses machine learning algorithms to train a model to predict the sentiment score of a text. The model is trained on a dataset of labeled test examples, each of which has been assigned a sentiment score. Once the model is trained, it can be used to predict the sentiment of new texts. It can be more accurate than lexicon-based sentiment analysis, but it requires a large amount of labeled training data and is more computationally expensive. It may also be susceptible to overfitting, with the model performing well on training data, but not on new data [@taj2021].
+
+-   ***Deep learning-based sentiment analysis***: is a type of machine learning-based sentiment analysis that uses deep neural networks to train a model to predict the sentiment of a text. Deep neural networks are able to learn complex patterns in data, which makes them well-suited for sentiment analysis tasks. This approach was seen by then researchers as the most accurate approach to sentiment analysis, but it requires a large amount of labeled training data and is computationally more expensive than the previous two approaches. They are also susceptible to overfitting [@taj2021].
+
+Studies such as [@budiharto2018prediction] have suggested frameworks into using sentiment analysis on posts on relevant topics on some social media websites to predict election results. Sentiment analysis can also be used to determine the mood of the nation by monitoring announcements made by leaders of the country, including presidential candidates [@vo2017multi]. [@bringula2023youtube] analyzed comments on Youtube to analyze opinions from political vloggers about two presidential canditates. Sentiment analysis can be used to summarize political issues and current affairs [@bollen2011modeling]. [@miranda2021exploring] studied State of the Nation Addresses of 13 Philippine presidents and discovered that the speeches had huge focus towards economic development, enhancement of public services, and addressing issues faced by the nation.
+
+## Latent Dirichlet Allocation
+
+Latent Dirichlet Allocation (LDA) is a generative probabilistic model for collections of discrete data such as text corpora [@blei2003lda]. It is a topic modeling technique, which means that it can be used to identify thematic topics in large collections of text.
+
+Topic modeling is thus an unsupervised learning technique that receives a collection of documents and produces topics as mathematical objects [@hamed2019]. Text topics describe the subject of the text. Topic modeling is trying to find similar topics across different documents, and trying to group different words together, such that each topic will consist of words with similar meanings [@blei2009]. LDA works by first assuming that each document is a mixture of topics, and then iteratively assigning each word in the document to a topic [@campbell2015]. The probability of a word being assigned to a topic is based on the distribution of words in that topic across all of the documents, and the distribution of topics in the document [@campbell2015].
+
+```{r}
+#| label: fig-lda-plate-diag
+#| fig.cap: LDA Model Plate Diagram
+
+img <- magick::image_read("C:/Users/User/OneDrive/Documents/School/2023/Masters/STA5073Z/Assignments/Assignment 2/ds4l-assignment-2/smoothed-lda.PNG")
+plot(img)
+```
+
+[@wang2018] presented a plate diagram of an LDA model @fig-lda-plate-diag where:
+
+-   $\alpha$: the per-document topic distributions (i.e. matrix of documents in rows and topics in columns),
+
+-   $\beta$: the per-topic word distribution (i.e. matrix of topics in rows and words in columns),
+
+-   $\theta$: the topic distribution for document *m*,
+
+-   $\phi$: the word distribution for topic *k*,
+
+-   *z:* the topic for the *n*-th word in document *m*, and
+
+-   *w:* the specific word
+
+The only observable variable in the LDA model is the word *w* in grey; each of the other variables is passive or *latent*. To tweak the model, we can adjust the $\alpha$ and $\beta$ parameters.\
+$\alpha$ controls the distribution of topics across documents. A symmetric distribution would mean that all topics are evenly distributed in all documents, while an asymmetric distribution would favour certain topics over others [@wang2018].
+
+$\beta$ controls the distribution of words within topics. Usually, each word is distributed evenly within a topic. However, we can bias certain topics to favour certain words. For example, in a topic about Apple products we can bias words such as *iphone* or *ipad* [@wang2018].
+
+Some of strengths of LDA include:
+
+-   Identifying topics distributed across multiple documents, and modeling relationships between topics.
+
+-   Ease of implementation and efficient allocation of computing resources.
+
+-   Language independence [@negara2019].
+
+In contrast, some of its weaknesses include:
+
+-   LDA's sensitivity to the number of specified topics. If the number of topics is too small, LDA may not be able to capture the full range of topics in the data. Conversely, if the number is too large, LDA may produce fragmented or incoherent topics.
+
+-   LDA can be difficult to interpret.
+
+-   LDA can be affected by data quality, especially for noisy or sparse data [@negara2019].
+
+LDA has been used in a variety of applications, including: identifying key topics in a collection of news articles; understanding the sentiment of customer reviews; and grouping social media posts into different topics [@wahid2022].
+
+While LDA is a relatively new tool in political science research, it has the potential to become an increasingly important tool for understanding political discourse and processes. It has been used in a variety of ways in political science research. For example, [@miranda20211exploring] used LDA to analyze the content of political speeches and texts to identify the key topics and themes. [@xu2020] used LDA to identify patterns in online discourse polarization and extremism, and the contributions and parameters thereof. [@brookes2019] used LDA to study the relationship between political discourse and political outcomes. [@mutanga2022] used LDA to identify the most topical issues relating to the COVID-19 pandemic that were being discussed by South Africans on Twitter, as well as the impacts of these issues on the people's reactions to and compliance with the South African government's efforts in managing the disease.
+
+Sentiment analysis and LDA are both powerful tools for studying political discourse. However, it is important to be aware of the strengths and weaknesses of each method. Sentiment analysis can be susceptible to noise and bias, and LDA can be difficult to interpret. In this paper, we use sentiment analysis and LDA to to conduct a descriptive analysis of the content of the past SONA speeches. We focus on the sentiment of the discourse as well as on identifying key topics and themes.
+
+# Data and Methodology
+
+## Data Preprocessing
+
+The full text of SONA speeches, from 1994 to 2023, was collected from the official South African Governement website. Data preprocessing is an essential phase in text analysis, aimed at transforming the raw text data into a structured format suitable for in-depth analysis of the speeches. For this we chose the 'tidytext' package found in R programming language which provided a versatile platform for text analysis
+
+The initial step in data preprocessing was to identify the date of the speech and the president who addressed the nation. Following this was the removal of special characters, digits and punctuation marks. Elements, such as symbols, commas, periods, and question marks, can introduce noise into the text and hinder accurate analysis. Numerical values and digits hold limited relevance and may disrupt the analysis of textual content. Their exclusion simplifies the text, making it more text-centric.
+
+To extract meaningful information from the text, tokenization is employed. It involves breaking down the continuous string of text into individual units, known as tokens, usually words or phrases. Tokenization provides the foundation for understanding the text's structure and content, making it more amenable to analysis. All the characters in the text are converted to lower case. This ensures that the analysis is not case sensitive. Stop words, commonly occurring words that hold not much meaning, are removed: shifting the focus to content-carrying words, enhancing the identification of significant themes and patterns in the SONA speeches.
+
+```{r}
+#| label: read_wrangle
+#| warning: false
+
 # Get a list of all text files in the directory
 text_files <- list.files(path = "data", pattern = ".txt")
 # filenames <- purrr::flatten(text_files)
@@ -149,15 +228,13 @@ sona <-sona %>%
          ,date = str_replace_all(date, '--', '')
   )
 
- 
-
 sona$date[36] <- "09-02-2023"
 sona$year[36] <- "2023"
 sona$date <- dmy(sona$date)
-
 ```
 
-```{r preprocess}
+```{r}
+#| label: preprocess
 
 speech_tokens <- sona %>%
   unnest_tokens(word, speech, token = "regex", pattern = unnest_reg) %>%
@@ -181,8 +258,86 @@ kable(bing_sample, caption = "Sample of bing lexicon")
 set.seed(2023)
 nrc_sample <- t(nrc[sample(1:6786, 10),])
 kable(nrc_sample, caption = "Sample of nrc lexicon")
-
 ```
+
+## Sentiment Analysis
+
+The aim of the sentiment analysis is to determine the emotional tonality expressed in the State of the Nation Address. At the core of this sentiment analysis lies the sentiment lexicon---a dictionary that associates words or phrases with sentiment scores. In this paper, three different lexicons found in the 'tidyr' package were used: AFINN, bing and nrc. The AFINN lexicon assigns a score to each word in the topic with -5 being the most negative and 5 being the most postive score.The bing lexicon assigns each word in the tolkenized speeches as either negative or positive according to the lexicon association. The nrc lexicon assigns each word in the tolkenized speeches into categories of positive, negative, anger, anticipation, disgust, fear, joy, sadness, surprise, and trust.
+
+## Latent Dirichlet Allocation
+
+LDA is, by its nature, an iterative process. First, determining the number of K's (topics) is an important first step in topic modelling. This leads to the organization and determination of our topics. The interpretation of topics largely depends on the actual context of the speeches and the choice of words. Reviewing each of the thiry six speeches would take tremendous effort; that said, the coherence and relevance of topics needs to be established in order to make meaning out of the model's results.
+
+In addition to the data preprocessing steps for sentiment analysis, particular care was taken to ensure that repetition across topics was minimized as much as possible given the number of topics which we decided to focus on (expanded on further below). Overlap between topics is normal. However, given the number of decided topics, the distinctiveness and interpretability of the topics was initially difficult to distinguish. This is especially evident in a large corpus of text like in our dataset. Thus less informative or repetitive words were removed.
+
+To perform topic modeling, we first created a document-term matrix (DTM), which is a sparse matrix containing the terms and documents in our corpus. We then removed terms that appeared fewer than two times or in more than half of the documents in order to improve computer processing. Next, we ran the LDA algorithm on the DTM to identify the latent topics in the collection of texts.
+
+Deciding on the optimal number of topics was done by training the LDA model for each number of topics from two to ten and computing the average of the coherence scores for each topic in each model. Coherence scores are a measure of how well the topics in the model explain the data [@blei2003lda]. It computes the pairwise similarity between the top words in each topic by giving a probabilistic coherence score for each topic. Semantically coherent topics are indicated by higher coherence scores. Stated differently, the higher the score for the specified number of K; for each topic, there will be more related words together and the topic would make more sense. Our dataset has speeches spanning nearly thirty years for six different presidents: thus, despite a lower value of K being associated with higher coherence, we could possibly lose a lot of nuance by choosing a lower value. Although, choosing a higher value of K could lead to overfitting and a higher chance of overlap or redundancy between topics [@blei2009].
+
+```{r}
+#| label: fig-ave-coherence
+#| fig-cap: "Topic Coherence Scores (Averaged). Higer values indicates that number of topics are more meaningful (in comparison)" 
+
+sona_tidy <- sona %>% 
+  unnest_tokens(word, speech, token = "words", to_lower = T) %>%
+  filter(!word %in% stop_words$word) %>%
+  filter(!str_detect(word, "[0-9]"))
+
+speech_tdf <- sona_tidy %>%
+  group_by(date,word) %>%
+  count() %>%  
+  ungroup()
+
+dtm_speech <- speech_tdf %>% 
+  cast_dtm(date, word, n)
+
+# Step 1: Remove terms appearing in more than half of the documents
+dtm_speech_filtered <- removeSparseTerms(dtm_speech, sparse = 0.5)  # Keep terms that appear in less than half of the documents
+
+# Step 2: Manually remove terms that appear less than 2 times
+dtm_speech_filtered <- removeSparseTerms(dtm_speech_filtered, sparse = 0.99)
+
+# Evaluate a range of topic numbers from 2 to 10
+k_list <- seq(2, 10, by = 1)
+
+# Train LDA models for each topic number
+models <- lapply(k_list, function(k) LDA(dtm_speech_filtered, k = k, control = list(seed = 2023)))
+
+# Calculate the topic coherence score for each model
+coherence <- sapply(models, function(model) topic_coherence(model, dtm_speech_filtered))
+
+average_coherence_scores <- c()
+
+for (i in seq_along(coherence)) {
+  average_coherence_scores[i] <- mean(coherence[[i]])
+}
+
+# Plot the topic coherence scores
+ggplot(data.frame(k = k_list, coherence = average_coherence_scores), aes(x = k, y = coherence)) +
+  geom_point() +
+  geom_line(group = 1) +
+  ggtitle("Topic Coherence Scores") +
+  xlab("Number of Topics") +
+  ylab("Coherence Score")
+```
+
+We plotted the averaged coherent scores for each value of K and found that the highest coherence score was achieved at ***k*** = 2 (followed by 4, then 3) as shown in @fig-ave-coherence. These are
+
+The three factors of interpretability, distinctiveness, and relevance were also taken into account in addition to the averaged coherence scores for each value of K. Each of the three factors will be expanded on below:
+
+-   ***Interpretability***: A smaller number of topics is generally more interpretative, as it easier to understand a smaller number of more general topics. For a larger number of topics, the topics may be more specific and less distinct [@blei2009].
+
+-   ***Distinctiveness***: A larger number of topics is generally more distinctive, as the topics are more specialized and less likely to overlap [@blei2009].
+
+-   ***Word relevance***: In a large number of topics, each word will be associated with a narrower range of topics [@blei2009].
+
+Given the trade-off between these factors as well as the coherence score of each number of topics, seven was decided on as the optimal amount of topics (even though two, four, and three had higher coherence scores). Relative interpretability and coherence was sacrificed for more distinctiveness and word relevance.
+
+Several words, such as *african*, *include*, *programme* appeared in most of the topics after the algorithm was run. These words either didn't provide much meaning to the topic, or were making the interpretation of the topic more difficult, so they were removed.
+
+# Results
+
+## Sentiment Analysis
 
 ```{r bing sentiment}
 speech_sentiment <- speech_tokens %>% 
@@ -233,7 +388,7 @@ We can see from @fig-positive that positive words such as 'reconciliation', 'fre
 
 @fig-nwords shows that most negative words used in each of the presidents. This may highlight some of the issues each president had experienced during their tenure. 'Crime' seems to be a word with one of the most commonly occurring in speeches made by Nelson Mandela, Thabo Mbeki, and Jacob Zuma. 'Poverty' is the most occuring negative word in Thabo Mbeki's speeches and also significant in Jacob Zuma's, and Cyril Ramaphosa's speeches.
 
-```{r overall}
+```{r}
 #| label: fig-overall
 #| fig-cap: "Proportion of sentiment words in speeches for each president"
 
@@ -271,10 +426,12 @@ speech_sentiment%>%
 
 ## Latent Dirichlet Allocation
 
-```{r LDA preprocessing}
+```{r}
+#| label: LDA preprocessing
+
 words_to_remove <- c("government", "South Africa", "national",
                      "country", "south", "africa", "honourable", 
-                     "people", 'ensure', 'public', 'continue', 'regard', 'development', 'support', 'africans', 'african', 'programme', 'programmes',  'compatriots', 'including',  'improve', 'address', 'president', 'deputy', 'services', 'chairperson', 'speaker', 'madame', 'sector', 'social', 'system', 'service', 'growth', 'million', 'past', 'time', 'process', 'world', 'progress', 'economy', 'economic', 'cape')
+                     "people", 'ensure', 'public', 'continue', 'regard', 'development', 'support', 'africans', 'african', 'programme', 'programmes',  'compatriots', 'including',  'improve', 'address', 'president', 'deputy', 'services', 'chairperson', 'speaker', 'madame', 'sector', 'social', 'system', 'service', 'growth', 'million', 'past', 'time', 'process', 'world', 'progress', 'economy', 'economic', 'cape', 'parties', 'ago', 'set', 'matter', 'manner')
 
 tidy_speeches <- sona %>% 
   unnest_tokens(word, speech, token = "words", to_lower = T) %>%
@@ -289,43 +446,23 @@ speech_tdf <- tidy_speeches%>%
 
 dtm_speech <- speech_tdf %>% 
   cast_dtm(date, word, n)
+
+# Step 1: Remove terms appearing in more than half of the documents
+dtm_speech_filtered <- removeSparseTerms(dtm_speech, sparse = 0.5)  # Keep terms that appear in less than half of the documents
+
+# Step 2: Manually remove terms that appear once
+dtm_speech_filtered <- removeSparseTerms(dtm_speech_filtered, sparse = 0.99)
 ```
 
-```{r optimal LDA}
-#| label: fig-ave-coherence
-#| fig-cap: "Topic Coherence Scores (Averaged). Higer values indicates that number of topics are more meaningful (in comparison)" 
+```{r}
+#| label: LDA model
 
-# Evaluate a range of topic numbers from 2 to 10
-k_list <- seq(2, 10, by = 1)
-
-# Train LDA models for each topic number
-models <- lapply(k_list, function(k) LDA(dtm_speech, k = k, control = list(seed = 2023)))
-
-# Calculate the topic coherence score for each model
-coherence <- sapply(models, function(model) topic_coherence(model, dtm_speech))
-
-average_coherence_scores <- c()
-
-for (i in seq_along(coherence)) {
-  average_coherence_scores[i] <- mean(coherence[[i]])
-}
-
-# Plot the topic coherence scores
-ggplot(data.frame(k = k_list, coherence = average_coherence_scores), aes(x = k, y = coherence)) +
-  geom_point() +
-  geom_line(group = 1) +
-  ggtitle("Topic Coherence Scores") +
-  xlab("Number of Topics") +
-  ylab("Coherence Score")
-```
-
-```{r LDA_model}
-speech_lda <- LDA(dtm_speech, k = 8, control = list(seed = 2023))
+speech_lda <- LDA(dtm_speech_filtered, k = 7, control = list(seed = 2023))
 
 speech_topics <- tidy(speech_lda, matrix = 'beta')
 ```
 
-```{r top_terms}
+```{r}
 #| label: fig-topterms-lda
 #| fig-cap: "Word-Topic Associations"  
 
@@ -343,16 +480,15 @@ top_terms %>%
   scale_y_reordered()
 ```
 
-\@fig-topterms-lda shows the most frequent words for each of the eight topics organized in descending order of the words' per-topic-per-word probabilities. The topics can be interpreted as follows:
+@fig-topterms-lda shows the most frequent words for each of the eight topics organized in descending order of the words' per-topic-per-word probabilities. The topics can be interpreted as follows:
 
-1.  **National Aspirations and Democracy**: this category represents topics related to national hopes, democratic values, and critical issues impacting society and citizens' lives. It emphasizes building strong relations within the nation.
-2.  **Security, Jobs, and Local Development**: this category centers on security concerns, job creation, local development, and empowering women to ensure freedom and safety in local communities.
-3.  **Societal Implementation and Poverty Alleviation**: this category focuses on implementing societal changes, addressing poverty, and enhancing community capacity and financial well-being. It's about improving the quality of life.
-4.  **Infrastructure, Business, and Education**: this category highlights topics related to infrastructure development, business growth, education, and land management. It addresses planning for local development and education.
-5.  **Business Investment and Health**: this category emphasizes business investment, job creation, infrastructure development, and measure to ensure better health in societies.
-6.  **Society, Security, and Local Governance**: this category covers societal and security concerns, life matters local governance, and democratic land management. It's about maintaining critical societal aspects.
-7.  **Human Welfare, Peace, and Global Engagement**: this category delves into human welfare, poverty, international relations, and hopes for a peaceful society and engagement in global matters over a decade.
-8.  **Infrastructure Investment and Anti-Corruption**: this category highlights infrastructure investment, billion-dollar projects, energy, and water management, with an emphasis on reducing corruption and empowering women.
+1.  **Economic Development and Job Creation**: this category represents topics related to economic development, job creation, and infrastructure development to support economic growth.
+2.  **Infrastructure and Energy Planning**: this category centers on infrastructure and energy planning, possibly related to financial and local development.
+3.  **Constitutional and Democratic Governance**: this category revolves around constitutional governance, democratic values, and human resources within a society.
+4.  **Public Safety and Community**: this category relates to issues of public safety, democracy, community life, and national security.
+5.  **Poverty Alleviation and Local Development**: this category emphasizes poverty allevation, improving security, and local development, with a focus on implementation and leadership.
+6.  **Infrastructure and Economic Opportunities:** this category covers infrastructure development, education, and economic opportunities, possibly with a focus on specific projects and inclusivity.
+7.  **International Engagement and Human Development**: this category delves into discussions related to international engagement, human development, poverty reduction, and the legacy of figures like Nelson Mandela.
 
 ```{r}
 sona$speechId <- as.numeric(speech_lda@documents)
@@ -369,7 +505,7 @@ speeches_gamma <- sona %>%
 ```{r}
 speeches_gamma_tbl <- speeches_gamma %>% 
   group_by(date, president) %>% 
-  summarize('National Aspirations and Democracy' = sum(topic_1 > 0.5), 'Security, Jobs, and Local Development' = sum(topic_2 > 0.5), 'Societal Implementation and Poverty Alleviation' = sum(topic_3 > 0.5), 'Infrastructure, Business, and Education' = sum(topic_4 > 0.5), 'Business Investment and Health' = sum(topic_5 > 0.5), 'Society, Security, and Local Governance' = sum(topic_6 > 0.5), 'Human Welfare, Peace, and Global Engagement' = sum(topic_7 > 0.5), 'Infrastructure Investment and Anti-Corruption' = sum(topic_8 > 0.5))
+  summarize(topic1 = sum(topic_1 > 0.5), topic2 = sum(topic_2 > 0.5), topic3 = sum(topic_3 > 0.5), topic4 = sum(topic_4 > 0.5), topic5 = sum(topic_5 > 0.5), topic6 = sum(topic_6 > 0.5), topic7 = sum(topic_7 > 0.5))
 
 # For appendix
 kable(speeches_gamma_tbl, caption = "Presidential-Topic Association")
@@ -394,13 +530,46 @@ ggplot(speeches_long, aes(x = president, y = gamma, fill = topic)) +
 
 @fig-prez-topic shows the *per-document-per-topic* probability by gamma. It shows how well the LDA model distinguishes between the different topics for each president. President de Klerk and President Motlanthe's distributions are noteworthy here: each is only represented by one speech, hence not much relevance is established to the topics. The dataset is unbalanced in this regard. Of course, de Klerk was the outgoing president at the turn of democracy in 1994, and Motlanthe served as the interim president when President Mbeki was recalled by his own party, the African National Congress (ANC), for the remainder of Mbeki's term.
 
-As years pass, it is natural to expect that certain topics are associated with certain presidents. President Mandela's term heralded the birth of modern South Africa. His speeches have notable associations with nation building and democracy (topic 1) and establishing a new society (topic 6).
+As years pass, it is natural to expect that certain topics are associated with certain presidents. President Mandela's term heralded the birth of modern South Africa. His speeches have notable associations with nation building and democracy (topic 1) and establishing a new society (topic 5).
 
-President Mbeki's, in turn, spoke to addressing poverty, increasing economic prosperity (Broad-Based Black Economic Empowerment legislation came into effect in 2003), peace (the 2001 terrorist attack on American soil spawned several wars in the Middle East region), and growing global influence.
+President Mbeki's, in turn, spoke to addressing poverty, increasing economic prosperity (Broad-Based Black Economic Empowerment legislation came into effect in 2003), strengthening international ties.
 
-President Zuma focussed quite heavily on infrastructure and growth. Indeed, the 2010 FIFA World Cup occurred under his presidency.
+President Zuma focussed quite heavily on infrastructure and economic growth. Indeed, he inherited the issue of Eskom's, the country's largest producer of electricity, energy crisis as well as foresaw the 2010 FIFA World Cup under his presidency.
 
-Lastly, President Ramaphosa has an association with continued infrastructure development, business investment (he is noted as an adept businessman), and health. Less than a year after his presidential term began, the COVID-19 virus caused a global pandemic. Anti-corruption rhetoric is also noted here: he succeeded President Zuma, who resigned in 2018 amidst his misuse of state expenditure for personal gain. His term is also associated with advocating for peace amidst the gender-based violence protests that occurred towards the end of 2019.
+Lastly, President Ramaphosa has an association with continued infrastructure development, business investment and job growth (he is noted as an adept businessman). The model, though, didn't pick up on the health concerns (less than a year after his presidential term began, the COVID-19 virus caused a global pandemic) and anti-corruption rhetoric in his speeches: he succeeded President Zuma, who resigned in 2018 amidst his misuse of state expenditure for personal gain. His term is also associated with advocating for peace amidst the gender-based violence protests that occurred towards the end of 2019, which the model failed to highlight.
+
+```{r}
+#| label: fig-topic-diagnostics
+#| fig.cap: "Topic Diagnostics"
+
+diag_df <- topic_diagnostics(speech_lda, dtm_speech_filtered)
+
+diag_df <- diag_df %>%
+  mutate(topic_label = terms(speech_lda, 5) %>%
+           apply(2, paste, collapse = ", "),
+         topic_label = paste(topic_num, topic_label, sep = " - "))
+
+diag_df %>% 
+  gather(diagnostic, value, -topic_label, -topic_num) %>%
+  ggplot(aes(x = topic_num, y = value,
+             fill = str_wrap(topic_label, 25))) +
+  geom_bar(stat = "identity") +
+  facet_wrap(~diagnostic, scales = "free") +
+  labs(x = "Topic Number", y = "Diagnostic Value",
+       fill = "Topic Label", title = "All Topic Model Diagnostics")
+```
+
+@fig-topic-diagnostics shows how the model performed in various metrics. Of particular note are the ***dist_from_corpus***, ***doc_prominence***, ***topic_coherence (which we touched on earlier)***, and ***topic_exclusivity*** plots.
+
+The *distance from the corpus* is a measure of how different a document is from the rest of the corpus by calculating the average distance between a topic's distribution and the topic distributions of all other documents in the collection. Higher scores indicate difference in the corpus [@angelov2020].
+
+*Document prominence* is a measure of how important a document is to a particular topic, by calculating the weighted average of the document's topic distribution (probabilities). Higher scores indicate importance to the corpus [@angelov2020].
+
+Lastly, *topic exclusivity* is a measure of how specific a topic is to a particular document, by calculating the normalized average of the topic's distribution. Higher scores here indicate the specificity of the topic to the document [@angelov2020].
+
+We note that Topic 3, which we labelled as ***Constitutional and Democratic Governance***, scores lowly in two of these metrics: it has little importance to the the corpus, is the most notably incoherent, and seems to be an outlier to the rest of the topics.
+
+The coherence scores here do leave much to be desired: perhaps the model would have to undergo additional hyperparameter tuning to mitigate the relatively low coherence scores.
 
 ```{r}
 #| label: fig-topic-time
@@ -417,14 +586,14 @@ speeches_long <- speeches_gamma %>%
 
 all_years <- all_years <- unique(speeches_long$year)
 
-speeches_long['topic'][speeches_long['topic'] == 1] <- '1: National Aspirations & Democracy'
-speeches_long['topic'][speeches_long['topic'] == 2] <- '2: Security, Jobs, & Local Development'
-speeches_long['topic'][speeches_long['topic'] == 3] <- '3: Societal Implementation & Poverty Alleviation'
-speeches_long['topic'][speeches_long['topic'] == 4] <- '4: Infrastructure, Business, and Education'
-speeches_long['topic'][speeches_long['topic'] == 5] <- '5: Business Investment & Health'
-speeches_long['topic'][speeches_long['topic'] == 6] <- '6: Society, Security, & Local Governance'
-speeches_long['topic'][speeches_long['topic'] == 7] <- '7: Human Welfare, Peace, & Global Engagement'
-speeches_long['topic'][speeches_long['topic'] == 8] <- '8: Infrastructure Investment & Anti-Corruption'
+# speeches_long['topic'][speeches_long['topic'] == 1] <- '1: National Aspirations & Democracy'
+# speeches_long['topic'][speeches_long['topic'] == 2] <- '2: Security, Jobs, & Local Development'
+# speeches_long['topic'][speeches_long['topic'] == 3] <- '3: Societal Implementation & Poverty Alleviation'
+# speeches_long['topic'][speeches_long['topic'] == 4] <- '4: Infrastructure, Business, and Education'
+# speeches_long['topic'][speeches_long['topic'] == 5] <- '5: Business Investment & Health'
+# speeches_long['topic'][speeches_long['topic'] == 6] <- '6: Society, Security, & Local Governance'
+# speeches_long['topic'][speeches_long['topic'] == 7] <- '7: Human Welfare, Peace, & Global Engagement'
+# speeches_long['topic'][speeches_long['topic'] == 8] <- '8: Infrastructure Investment & Anti-Corruption'
 
 # Create a stacked bar plot
 ggplot(speeches_long, aes(x = factor(year, levels = all_years), fill = factor(topic))) +
@@ -451,9 +620,21 @@ ggplot(speeches_long, aes(x = factor(year, levels = all_years), fill = factor(to
 
 Each presidential administration faces unique challenges that distinguishes itself from the other; and each presidential term is five years, which coincides with the election cycle. Thus the theme-presidential association applies here, too.
 
-# Discussion
+# Discussion & Conclusion
 
-# Conclusion
+The SONA serves as a significant pillar of democratic governance, whereby the President of South Africa addresses Parliament, as established earlier. The existing literature touts data mining techniques such as sentiment analysis and LDA as valuable tools in helping analyze political speeches. They each present a framework for facilitating a deeper understanding of the content and themes of across a large body of text. The integration of sentiment analysis was used to uncover the emotional tonality, while LDA identifies the thematic topics present in these significant political addresses.
+
+In our research, we obtained the full text of SONA speeches from the official South African Government website, spanning nearly three decades and six different presidents. The preprocessing steps encompassed identifying key information, removing noise-inducing elements, tokenization, and eliminating stop words. These steps collectively enhanced the quality and focus of the analysis, allowing for a more insightful understanding of the content and themes of the SONA speeches.
+
+The use of diverse sentiment lexicons provides a comprehensive insight into the emotional nuances present in the speeches.
+
+The iterative nature of LDA is essential to determine the number of topics, organize these topics, and interpret them. However, the challenge of coherence and relevance must be managed, especially in a large corpus like the SONA speeches dataset. Steps were taken to minimize word repetition and enhance the distinctiveness and interpretability of the topics.
+
+The selection of the optimal number of topics was achieved through the assessment of coherence scores, striking a balance between semantic coherence and the risk of overfitting in a dataset.
+
+While the sentiment analysis proved effective, our model didn't perform as well as expected on this particular dataset. It is worth considering hyperparameter tuning for better results.
+
+The lessons gained from this study, by combining sentiment analysis and LDA, can equip us to conduct a nuanced and rigorous analysis of the SONA speeches, furthering our understanding of their emotional content and thematic patterns in political discourse.
 
 \newpage
 
