@@ -4,8 +4,8 @@
 /.Rproj.user
 
 .gitignore
-.Rproj.user
-.Rhistory
+*.Rproj.user
+*.Rhistory
 *.RData
 *.Ruserdata
 *.zip
@@ -13,3 +13,5 @@
 *.docx
 *.pdf
 *.png
+*.rdb
+*.rdx
