@@ -2,6 +2,7 @@ dplyr
 ggplot2
 kableExtra
 lubridate
+magick
 purrr
 reshape2
 stringr
@@ -14,6 +15,3 @@ NLP
 tm
 RColorBrewer
 wordcloud
-magrittr
-imager
-magick

@@ -63,8 +63,7 @@ The State of the Nation Address (SONA) in South Africa is a pivotal annual event
 
 Sentiment analysis and Latent Dirichlet Allocation (LDA) are two data mining techniques that can be used to study political discourse. Sentiment analysis can be used to identify the emotional tone of text, while LDA can be used to identify thematic topics in large collections of text.
 
-The research involved collecting and processing SONA speeches from 1994 to 2023, utilizing data preprocessing to make the text suitable for analysis. The analysis included sentiment analysis using various lexicons, LDA for topic modeling, and determining the optimal number of topics through
-coherence scores, ultimately selecting seven topics for more distinct and relevant results.
+The research involved collecting and processing SONA speeches from 1994 to 2023, utilizing data preprocessing to make the text suitable for analysis. The analysis included sentiment analysis using various lexicons, LDA for topic modeling, and determining the optimal number of topics through coherence scores, ultimately selecting seven topics for more distinct and relevant results.
 
 The analysis involves examining the frequency of positive and negative words in speeches by different South African presidents, highlighting how these trends change over time. It also evaluates the performance of an LDA model in distinguishing topics discussed in the speeches and how these topics are associated with different presidents, with specific attention to the LDA model's metrics, topic relevance over time, and their connection to presidential terms.
 
@@ -249,15 +248,6 @@ speech_tokens <- speech_tokens %>%
 
 
 load("dsfi-lexicons.Rdata")
-
-#to be put in the appendices 
-set.seed(2023)
-bing_sample <- t(bing[sample(1:6786, 10),])
-kable(bing_sample, caption = "Sample of bing lexicon")
-
-set.seed(2023)
-nrc_sample <- t(nrc[sample(1:6786, 10),])
-kable(nrc_sample, caption = "Sample of nrc lexicon")
 ```
 
 ## Sentiment Analysis
@@ -266,7 +256,7 @@ The aim of the sentiment analysis is to determine the emotional tonality express
 
 ## Latent Dirichlet Allocation
 
-LDA is, by its nature, an iterative process. First, determining the number of K's (topics) is an important first step in topic modelling. This leads to the organization and determination of our topics. The interpretation of topics largely depends on the actual context of the speeches and the choice of words. Reviewing each of the thiry six speeches would take tremendous effort; that said, the coherence and relevance of topics needs to be established in order to make meaning out of the model's results.
+LDA is, by its nature, an iterative process. First, determining the number of K's (topics) is an important first step in topic modelling. This leads to the organization and determination of our topics. The interpretation of topics largely depends on the actual context of the speeches and the choice of words. The coherence and relevance of topics needs to be established in order to make meaning out of the model's results.
 
 In addition to the data preprocessing steps for sentiment analysis, particular care was taken to ensure that repetition across topics was minimized as much as possible given the number of topics which we decided to focus on (expanded on further below). Overlap between topics is normal. However, given the number of decided topics, the distinctiveness and interpretability of the topics was initially difficult to distinguish. This is especially evident in a large corpus of text like in our dataset. Thus less informative or repetitive words were removed.
 
@@ -339,7 +329,9 @@ Several words, such as *african*, *include*, *programme* appeared in most of the
 
 ## Sentiment Analysis
 
-```{r bing sentiment}
+```{r}
+#| label: bing sentiment
+
 speech_sentiment <- speech_tokens %>% 
   left_join(bing, by = "word") %>%
   rename(bing_sentiment = sentiment) %>%
@@ -370,7 +362,8 @@ speech_sentiment %>%
 
 ```
 
-```{r nrc}
+```{r}
+#| label: nrc
 
 speech_sentiment <- speech_sentiment %>% 
 left_join(nrc, by = "word") %>%
@@ -491,6 +484,8 @@ top_terms %>%
 7.  **International Engagement and Human Development**: this category delves into discussions related to international engagement, human development, poverty reduction, and the legacy of figures like Nelson Mandela.
 
 ```{r}
+#| label: speech_gamma
+
 sona$speechId <- as.numeric(speech_lda@documents)
 
 speeches_gamma_init <- tidy(speech_lda, matrix = "gamma")
@@ -500,15 +495,6 @@ speeches_gamma <- sona %>%
     mutate(speechId = as.numeric(document)) %>% 
     select(-document) %>%
     spread(key = topic, value = gamma, sep = "_"))
-```
-
-```{r}
-speeches_gamma_tbl <- speeches_gamma %>% 
-  group_by(date, president) %>% 
-  summarize(topic1 = sum(topic_1 > 0.5), topic2 = sum(topic_2 > 0.5), topic3 = sum(topic_3 > 0.5), topic4 = sum(topic_4 > 0.5), topic5 = sum(topic_5 > 0.5), topic6 = sum(topic_6 > 0.5), topic7 = sum(topic_7 > 0.5))
-
-# For appendix
-kable(speeches_gamma_tbl, caption = "Presidential-Topic Association")
 ```
 
 ```{r}
@@ -528,15 +514,15 @@ ggplot(speeches_long, aes(x = president, y = gamma, fill = topic)) +
   theme_minimal()
 ```
 
-@fig-prez-topic shows the *per-document-per-topic* probability by gamma. It shows how well the LDA model distinguishes between the different topics for each president. President de Klerk and President Motlanthe's distributions are noteworthy here: each is only represented by one speech, hence not much relevance is established to the topics. The dataset is unbalanced in this regard. Of course, de Klerk was the outgoing president at the turn of democracy in 1994, and Motlanthe served as the interim president when President Mbeki was recalled by his own party, the African National Congress (ANC), for the remainder of Mbeki's term.
+@fig-prez-topic shows the *per-document-per-topic* probability by gamma. It shows how well the LDA model distinguishes between the different topics for each president. President de Klerk and President Motlanthe's distributions are noteworthy here: each is only represented by one speech, hence not much relevance is established to the topics. The dataset is unbalanced in this regard. de Klerk was the outgoing president at the turn of democracy in 1994, and Motlanthe served as the interim president when President Mbeki was recalled by his own party, the African National Congress (ANC), for the remainder of Mbeki's term.
 
-As years pass, it is natural to expect that certain topics are associated with certain presidents. President Mandela's term heralded the birth of modern South Africa. His speeches have notable associations with nation building and democracy (topic 1) and establishing a new society (topic 5).
+Certain topics are associated with certain presidents as time passes. President Mandela's term heralded the birth of modern South Africa. His speeches have notable associations with nation building and democracy (topic 1) and establishing a new society (topic 5) [@sagov].
 
-President Mbeki's, in turn, spoke to addressing poverty, increasing economic prosperity (Broad-Based Black Economic Empowerment legislation came into effect in 2003), strengthening international ties.
+President Mbeki's, in turn, spoke to addressing poverty, increasing economic prosperity (Broad-Based Black Economic Empowerment legislation came into effect in 2003), strengthening international ties [@sagov].
 
-President Zuma focussed quite heavily on infrastructure and economic growth. Indeed, he inherited the issue of Eskom's, the country's largest producer of electricity, energy crisis as well as foresaw the 2010 FIFA World Cup under his presidency.
+President Zuma focussed quite heavily on infrastructure and economic growth. Indeed, he inherited the issue of Eskom's, the country's largest producer of electricity, energy crisis as well as foresaw the 2010 FIFA World Cup under his presidency [@sagov].
 
-Lastly, President Ramaphosa has an association with continued infrastructure development, business investment and job growth (he is noted as an adept businessman). The model, though, didn't pick up on the health concerns (less than a year after his presidential term began, the COVID-19 virus caused a global pandemic) and anti-corruption rhetoric in his speeches: he succeeded President Zuma, who resigned in 2018 amidst his misuse of state expenditure for personal gain. His term is also associated with advocating for peace amidst the gender-based violence protests that occurred towards the end of 2019, which the model failed to highlight.
+Lastly, President Ramaphosa has an association with continued infrastructure development, business investment and job growth (he is noted as an adept businessman). The model, though, didn't pick up on the health concerns (less than a year after his presidential term began, the COVID-19 virus caused a global pandemic) and anti-corruption rhetoric in his speeches: he succeeded President Zuma, who resigned in 2018 amidst his misuse of state expenditure for personal gain. His term is also associated with advocating for peace amidst the gender-based violence protests that occurred towards the end of 2019, which the model failed to highlight [@sagov].
 
 ```{r}
 #| label: fig-topic-diagnostics
@@ -616,9 +602,9 @@ ggplot(speeches_long, aes(x = factor(year, levels = all_years), fill = factor(to
 
 -   Zuma: 2009 - 2018
 
--   Ramaphosa: 2018 - current
+-   Ramaphosa: 2018 - current [@sagov]
 
-Each presidential administration faces unique challenges that distinguishes itself from the other; and each presidential term is five years, which coincides with the election cycle. Thus the theme-presidential association applies here, too.
+Each presidential administration faces unique challenges that distinguishes itself from the other; and each presidential term is five years, which coincides with the election cycle. Thus the theme-presidential association applies here, too. It is notable though that increased focus has been spent on economic and infrastructural development as South Africa experienced worsening economic indicators (weak GDP growth, high unemployment) and increased rolling blackouts in recent years (2018 - current) [@sagov]. These point to the weakening of South Africa's public institutions - a sign of the malaise that has crept into the ruling party.
 
 # Discussion & Conclusion
 
